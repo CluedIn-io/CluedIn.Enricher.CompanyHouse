@@ -14,8 +14,7 @@ using CluedIn.Testing.Base.Processing.Actors;
 using Moq;
 using Xunit;
 
-
-namespace Integration.Tests
+namespace ExternalSearch.CompanyHouse.Integration.Tests
 {
     public class CompanyHouseGraphTests : BaseExternalSearchTest<CompanyHouseExternalSearchProvider>
     {
