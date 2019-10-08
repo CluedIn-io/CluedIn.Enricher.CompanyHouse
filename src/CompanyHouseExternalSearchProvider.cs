@@ -60,7 +60,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             var country = request.EntityMetaData.Properties.ContainsKey(CluedIn.Core.Data.Vocabularies.Vocabularies.CluedInOrganization.AddressCountryCode) ? request.EntityMetaData.Properties[CluedIn.Core.Data.Vocabularies.Vocabularies.CluedInOrganization.AddressCountryCode].ToLowerInvariant() : string.Empty;
 
             // TODO: Should put a filter here to only lookup UK based companies.
-            if (country.Contains("uk"))
+            if (country.Contains("uk") || country.Contains("gb"))
             {
                 var organizationName = request.QueryParameters.GetValue(CluedIn.Core.Data.Vocabularies.Vocabularies.CluedInOrganization.OrganizationName, new HashSet<string>());
 
