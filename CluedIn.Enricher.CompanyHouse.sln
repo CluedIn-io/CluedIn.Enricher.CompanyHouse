@@ -50,7 +50,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Git", "Git", "{17EE3C8D-BAE
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExternalSearch.Providers.CompanyHouse", "src\ExternalSearch.Providers.CompanyHouse.csproj", "{DD41C500-E3DA-480C-9D5F-C55A903B584C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Integration.Tests", "test\integration\Integration.Tests\Integration.Tests.csproj", "{530F5400-CA6A-4993-BFB8-DDD98AE3C6AD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExternalSearch.CompanyHouse.Integration.Tests", "test\integration\Integration.Tests\ExternalSearch.CompanyHouse.Integration.Tests.csproj", "{530F5400-CA6A-4993-BFB8-DDD98AE3C6AD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
