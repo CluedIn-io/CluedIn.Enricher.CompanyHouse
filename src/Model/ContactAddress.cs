@@ -2,6 +2,7 @@
 {
     public class ContactAddress
     {
+        public string care_of { get; set; }
         public string region { get; set; }
         public string postal_code { get; set; }
         public string premises { get; set; }

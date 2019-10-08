@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ClearBitOrganizationVocabulary.cs" company="Clued In">
+// <copyright file="CompanyHouseOrganizationVocabulary.cs" company="Clued In">
 //   Copyright Clued In
 // </copyright>
 // <summary>
-//   Defines the ClearBitOrganizationVocabulary type.
+//   Defines the CompanyHouseOrganizationVocabulary type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -21,42 +21,40 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse.Vocabularies
         /// </summary>
         public CompanyHouseOrganizationVocabulary()
         {
-            this.VocabularyName = "CompanyHouse Organization";
-            this.KeyPrefix = "companyHouse.organization";
-            this.KeySeparator   = ".";
-            this.Grouping       = EntityType.Organization;
+            VocabularyName = "CompanyHouse Organization";
+            KeyPrefix = "companyHouse.organization";
+            KeySeparator   = ".";
+            Grouping       = EntityType.Organization;
 
-            this.CompanyNumber  = this.Add(new VocabularyKey("companyNumber", VocabularyKeyDataType.Text));
+            AddGroup("Metadata", group =>
+            {
+                CompanyNumber = group.Add(new VocabularyKey("companyNumber", VocabularyKeyDataType.Text, VocabularyKeyVisibility.Hidden));
+                Type = group.Add(new VocabularyKey("type", VocabularyKeyDataType.Text));
+                Charges = group.Add(new VocabularyKey("charges", VocabularyKeyDataType.Text));
+                CompanyStatus = group.Add(new VocabularyKey("companyStatus", VocabularyKeyDataType.Text));
+                DateOfCreation = group.Add(new VocabularyKey("dateOfCreation", VocabularyKeyDataType.Text));
+                Jurisdiction = group.Add(new VocabularyKey("jurisdiction", VocabularyKeyDataType.Text));
+                Has_been_liquidated = group.Add(new VocabularyKey("has_been_liquidated", VocabularyKeyDataType.Text));
+                Has_insolvency_history = group.Add(new VocabularyKey("has_insolvency_history", VocabularyKeyDataType.Text));
+                Registered_office_is_in_dispute = group.Add(new VocabularyKey("registered_office_is_in_dispute", VocabularyKeyDataType.Text));
+            });
 
-            this.LinksSelf      = this.Add(new VocabularyKey("linksSelf", VocabularyKeyDataType.Text));
-            this.CompanyStatus  = this.Add(new VocabularyKey("companyStatus", VocabularyKeyDataType.Text));
-            this.DateOfCreation = this.Add(new VocabularyKey("dateOfCreation", VocabularyKeyDataType.Text));
+            AddGroup("Address", group =>
+            {
+                Address = group.Add(new CompanyHouseOrgAddressVocabulary().AsCompositeKey("address"));
+            });
         }
 
-        public VocabularyKey CompanyNumber { get; set; }
-        //public VocabularyKey AddressLine1 { get; internal set; }
-        //public VocabularyKey AddressLine2 { get; internal set; }
-        //public VocabularyKey Country { get; internal set; }
-        //public VocabularyKey Etag { get; internal set; }
-        //public VocabularyKey Locality { get; internal set; }
-        //public VocabularyKey PostalCode { get; internal set; }
-        //public VocabularyKey PoBox { get; internal set; }
-        //public VocabularyKey Premises { get; internal set; }
-        //public VocabularyKey Region { get; internal set; }
-        //public VocabularyKey AddressSnippet { get; internal set; }
-        //public VocabularyKey AcquiredOn { get; internal set; }
-        //public VocabularyKey MainCompanyAddress1 { get; internal set; }
-        //public VocabularyKey MainCompanyAddress2 { get; internal set; }
-        //public VocabularyKey MainCompanyCountry { get; internal set; }
-        //public VocabularyKey MainCompanyLocality { get; internal set; }
-        //public VocabularyKey MainCompanyPostalCode { get; internal set; }
-        //public VocabularyKey MainCompanyPoBox { get; internal set; }
-        //public VocabularyKey MainCompanyPremises { get; internal set; }
-        //public VocabularyKey MainCompanyRegion { get; internal set; }
-        public VocabularyKey LinksSelf { get; internal set; }
-        //public VocabularyKey Kind { get; internal set; }
-        public VocabularyKey CompanyStatus { get; internal set; }
-        //public VocabularyKey CompanyType { get; internal set; }
-        public VocabularyKey DateOfCreation { get; internal set; }
+        public VocabularyKey CompanyNumber { get; protected set; }
+        public VocabularyKey Type { get; protected set; }
+        public VocabularyKey Charges { get; protected set; }
+        public VocabularyKey CompanyStatus { get; protected set; }
+        public VocabularyKey DateOfCreation { get; protected set; }
+        public VocabularyKey Jurisdiction { get; protected set; }
+        public VocabularyKey Has_been_liquidated { get; protected set; }
+        public VocabularyKey Has_insolvency_history { get; protected set; }
+        public VocabularyKey Registered_office_is_in_dispute { get; protected set; }
+
+        public CompanyHouseOrgAddressVocabulary Address { get; protected set; }
     }
 }

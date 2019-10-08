@@ -23,5 +23,6 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse.Model
         public Links links { get; set; }
         public bool registered_office_is_in_dispute { get; set; }
         public bool can_file { get; set; }
+        public string original_query_name { get; set; }
     }
 }
