@@ -17,5 +17,6 @@
         public OfficerResponse disqualifiedNaturalResponse { get; set; }
         public OfficerResponse disqualifiedCorporateResponse { get; set; }
         public string regNumber { get; set; }
+
     }
 }
