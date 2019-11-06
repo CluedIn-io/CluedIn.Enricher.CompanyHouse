@@ -105,30 +105,11 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 
             foreach (var companyResult in companies)
             {
-                var companyAndContact = new CompanyAndContacts();
+                var company = new CompanyNew();
 
-                companyAndContact.Company = client.GetCompany(companyResult.company_number);
+                company = client.GetCompany(companyResult.company_number);
 
-                var officersResult = client.GetOfficers(companyResult.company_number);
-                var officers = new List<Contact>();
-                if (officersResult != null)
-                {
-                    foreach (var officer in officersResult)
-                    {
-                        var regNumber = officer.links.officer.appointments.Split('/')[2];
-                        officer.regNumber = regNumber;
-                        officer.appointmentResponse = client.GetAppointment(regNumber);
-                        officer.disqualifiedNaturalResponse = client.GetDisqualifiedNaturalResponse(regNumber);
-                        officer.disqualifiedNaturalResponse = client.GetDisqualifiedCorporateResponse(regNumber);
-
-                        officers.Add(officer);
-                    }
-                }
-
-                companyAndContact.contact = officers;
-
-                companyAndContact.Company.original_query_name = query.QueryKey.Split(':')[1].Replace(";", string.Empty);
-                yield return new ExternalSearchQueryResult<CompanyAndContacts>(query, companyAndContact);
+                yield return new ExternalSearchQueryResult<CompanyNew>(query, company);
             }
 
         }
@@ -141,30 +122,15 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         /// <returns>The clues.</returns>
         public override IEnumerable<Clue> BuildClues(ExecutionContext context, IExternalSearchQuery query, IExternalSearchQueryResult result, IExternalSearchRequest request)
         {
-            var resultItem = result.As<CompanyAndContacts>();
+            var resultItem = result.As<CompanyNew>();
 
-            var code = new EntityCode(EntityType.Organization, this.GetCodeOrigin(), resultItem.Data.Company.company_number);
+            var code = new EntityCode(EntityType.Organization, this.GetCodeOrigin(), resultItem.Data.company_number);
 
             var clue = new Clue(code, context.Organization);
             clue.Data.OriginProviderDefinitionId = this.Id;
 
-            this.PopulateMetadata(clue.Data.EntityData, resultItem.Data.Company);
+            this.PopulateMetadata(clue.Data.EntityData, resultItem.Data);
             yield return clue;
-
-            if (resultItem.Data.contact != null)
-                foreach (var contact in resultItem.Data.contact)
-                {
-                    if (contact != null)
-                    {
-                        var codeContact = new EntityCode(EntityType.Person, this.GetCodeOrigin(), contact.regNumber);
-                        var contactClue = new Clue(codeContact, context.Organization);
-
-                        contactClue.Data.OriginProviderDefinitionId = this.Id;
-
-                        this.PopulateContactMetadata(clue.Data.EntityData, contact);
-                        yield return contactClue;
-                    }
-                }
         }
 
         /// <summary>Gets the primary entity metadata.</summary>
@@ -174,7 +140,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         /// <returns>The primary entity metadata.</returns>
         public override IEntityMetadata GetPrimaryEntityMetadata(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request)
         {
-            var resultItem = result.As<CompanyAndContacts>();
+            var resultItem = result.As<CompanyNew>();
             return this.CreateMetadata(resultItem);
         }
 
@@ -191,11 +157,11 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         /// <summary>Creates the metadata.</summary>
         /// <param name="resultItem">The result item.</param>
         /// <returns>The metadata.</returns>
-        private IEntityMetadata CreateMetadata(IExternalSearchQueryResult<CompanyAndContacts> resultItem)
+        private IEntityMetadata CreateMetadata(IExternalSearchQueryResult<CompanyNew> resultItem)
         {
             var metadata = new EntityMetadataPart();
 
-            this.PopulateMetadata(metadata, resultItem.Data.Company);
+            this.PopulateMetadata(metadata, resultItem.Data);
 
             return metadata;
         }
@@ -255,6 +221,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             metadata.Properties[vocab.Locality] = resultCompany.registered_office_address.locality.PrintIfAvailable();
             metadata.Properties[vocab.PostCode] = resultCompany.registered_office_address.postal_code.PrintIfAvailable();
         }
+
 
         private void PopulateContactMetadata(IEntityMetadata metadata, Contact resultItem)
         {
