@@ -24,7 +24,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse.Vocabularies
             VocabularyName = "CompanyHouse Person";
             KeyPrefix = "companyHouse.person";
             KeySeparator   = ".";
-            Grouping       = EntityType.Person;
+            Grouping       = EntityType.Infrastructure.User;
 
             Name = Add(new VocabularyKey("name", VocabularyKeyDataType.Text));
             Officer_role = Add(new VocabularyKey("officer_role", VocabularyKeyDataType.Text));

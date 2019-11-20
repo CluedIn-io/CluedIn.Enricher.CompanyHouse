@@ -17,6 +17,8 @@ using CluedIn.ExternalSearch.Providers.CompanyHouse.Vocabularies;
 using CluedIn.ExternalSearch.Filters;
 using CluedIn.Crawling.Helpers;
 using CluedIn.ExternalSearch.Providers.CompanyHouse.Model;
+using System.Configuration;
+using CluedIn.Core.Configuration;
 
 namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 {
@@ -105,11 +107,30 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 
             foreach (var companyResult in companies)
             {
-                var company = new CompanyNew();
+                var companyAndContact = new CompanyAndContacts();
 
-                company = client.GetCompany(companyResult.company_number);
+                companyAndContact.Company = client.GetCompany(companyResult.company_number);
 
-                yield return new ExternalSearchQueryResult<CompanyNew>(query, company);
+                var officersResult = client.GetOfficers(companyResult.company_number);
+                var officers = new List<Contact>();
+                if (officersResult != null)
+                {
+                    foreach (var officer in officersResult)
+                    {
+                        var regNumber = officer.links.officer.appointments.Split('/')[2];
+                        officer.regNumber = regNumber;
+                        officer.appointmentResponse = client.GetAppointment(regNumber);
+                        officer.disqualifiedNaturalResponse = client.GetDisqualifiedNaturalResponse(regNumber);
+                        officer.disqualifiedNaturalResponse = client.GetDisqualifiedCorporateResponse(regNumber);
+
+                        officers.Add(officer);
+                    }
+                }
+
+                companyAndContact.contact = officers;
+
+                companyAndContact.Company.original_query_name = query.QueryKey.Split(':')[1].Replace(";", string.Empty);
+                yield return new ExternalSearchQueryResult<CompanyAndContacts>(query, companyAndContact);
             }
 
         }
@@ -122,14 +143,32 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         /// <returns>The clues.</returns>
         public override IEnumerable<Clue> BuildClues(ExecutionContext context, IExternalSearchQuery query, IExternalSearchQueryResult result, IExternalSearchRequest request)
         {
-            var resultItem = result.As<CompanyNew>();
+            var resultItem = result.As<CompanyAndContacts>();
 
-            var code = new EntityCode(EntityType.Organization, this.GetCodeOrigin(), resultItem.Data.company_number);
+            var code = new EntityCode(EntityType.Organization, this.GetCodeOrigin(), resultItem.Data.Company.company_number);
 
             var clue = new Clue(code, context.Organization);
             clue.Data.OriginProviderDefinitionId = this.Id;
 
             this.PopulateMetadata(clue.Data.EntityData, resultItem.Data);
+            if (ConfigurationManager.AppSettings.GetFlag("Feature.CompanyHouse.CreatePeopleClues", false))
+            {
+                if (resultItem.Data.contact != null)
+                    foreach (var contact in resultItem.Data.contact)
+                    {
+                        if (contact != null)
+                        {
+                            var codeContact = new EntityCode(EntityType.Infrastructure.User, this.GetCodeOrigin(), contact.regNumber);
+                            var contactClue = new Clue(codeContact, context.Organization);
+
+                            contactClue.Data.OriginProviderDefinitionId = this.Id;
+
+                            this.PopulateContactMetadata(clue.Data.EntityData, contact);
+                            yield return contactClue;
+                        }
+                    }
+            }
+
             yield return clue;
         }
 
@@ -140,7 +179,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         /// <returns>The primary entity metadata.</returns>
         public override IEntityMetadata GetPrimaryEntityMetadata(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request)
         {
-            var resultItem = result.As<CompanyNew>();
+            var resultItem = result.As<CompanyAndContacts>();
             return this.CreateMetadata(resultItem);
         }
 
@@ -157,7 +196,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         /// <summary>Creates the metadata.</summary>
         /// <param name="resultItem">The result item.</param>
         /// <returns>The metadata.</returns>
-        private IEntityMetadata CreateMetadata(IExternalSearchQueryResult<CompanyNew> resultItem)
+        private IEntityMetadata CreateMetadata(IExternalSearchQueryResult<CompanyAndContacts> resultItem)
         {
             var metadata = new EntityMetadataPart();
 
@@ -176,42 +215,42 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         /// <summary>Populates the metadata.</summary>
         /// <param name="metadata">The metadata.</param>
         /// <param name="resultCompany">The result item.</param>
-        private void PopulateMetadata(IEntityMetadata metadata, CompanyNew resultCompany)
+        private void PopulateMetadata(IEntityMetadata metadata, CompanyAndContacts resultCompany)
         {
-            var code = new EntityCode(EntityType.Organization, this.GetCodeOrigin(), resultCompany.company_number);
+            var code = new EntityCode(EntityType.Organization, this.GetCodeOrigin(), resultCompany.Company.company_number);
 
             metadata.EntityType = EntityType.Organization;
 
             metadata.OriginEntityCode = code;
-            metadata.Name = resultCompany.original_query_name.PrintIfAvailable();
-            if (!string.IsNullOrEmpty(resultCompany.company_name))
-                metadata.Codes.Add(new EntityCode(EntityType.Organization, this.GetCodeOrigin(), resultCompany.company_name));
+            metadata.Name = resultCompany.Company.original_query_name.PrintIfAvailable();
+            if (!string.IsNullOrEmpty(resultCompany.Company.company_name))
+                metadata.Codes.Add(new EntityCode(EntityType.Organization, this.GetCodeOrigin(), resultCompany.Company.company_name));
 
-            metadata.DisplayName = resultCompany.company_name.PrintIfAvailable();
+            metadata.DisplayName = resultCompany.Company.company_name.PrintIfAvailable();
 
-            metadata.Properties[CompanyHouseVocabulary.Organization.CompanyNumber] = resultCompany.company_number.PrintIfAvailable();
-            metadata.Properties[CompanyHouseVocabulary.Organization.Charges] = resultCompany.has_charges.PrintIfAvailable();
-            metadata.Properties[CompanyHouseVocabulary.Organization.CompanyStatus] = resultCompany.company_status.PrintIfAvailable();
-            metadata.Properties[CompanyHouseVocabulary.Organization.Type] = resultCompany.type.PrintIfAvailable();
-            metadata.Properties[CompanyHouseVocabulary.Organization.Jurisdiction] = resultCompany.jurisdiction.PrintIfAvailable();
-            metadata.Properties[CompanyHouseVocabulary.Organization.Has_been_liquidated] = resultCompany.has_been_liquidated.PrintIfAvailable();
-            metadata.Properties[CompanyHouseVocabulary.Organization.Has_insolvency_history] = resultCompany.has_insolvency_history.PrintIfAvailable();
-            metadata.Properties[CompanyHouseVocabulary.Organization.Registered_office_is_in_dispute] = resultCompany.registered_office_is_in_dispute.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.CompanyNumber] = resultCompany.Company.company_number.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Charges] = resultCompany.Company.has_charges.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.CompanyStatus] = resultCompany.Company.company_status.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Type] = resultCompany.Company.type.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Jurisdiction] = resultCompany.Company.jurisdiction.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Has_been_liquidated] = resultCompany.Company.has_been_liquidated.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Has_insolvency_history] = resultCompany.Company.has_insolvency_history.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Registered_office_is_in_dispute] = resultCompany.Company.registered_office_is_in_dispute.PrintIfAvailable();
 
-            if (!string.IsNullOrEmpty(resultCompany.date_of_creation))
+            if (!string.IsNullOrEmpty(resultCompany.Company.date_of_creation))
             {
                 DateTimeOffset createdDate;
 
-                if (DateTimeOffset.TryParse(resultCompany.date_of_creation, out createdDate))
+                if (DateTimeOffset.TryParse(resultCompany.Company.date_of_creation, out createdDate))
                 {
                     metadata.CreatedDate = createdDate;
                 }
 
-                metadata.Properties[CompanyHouseVocabulary.Organization.DateOfCreation] = resultCompany.date_of_creation;
+                metadata.Properties[CompanyHouseVocabulary.Organization.DateOfCreation] = resultCompany.Company.date_of_creation;
             }
 
-            if (resultCompany.registered_office_address != null)
-                this.PopulateOrgAddressMetadata(metadata, CompanyHouseVocabulary.Organization.Address, resultCompany);
+            if (resultCompany.Company.registered_office_address != null)
+                this.PopulateOrgAddressMetadata(metadata, CompanyHouseVocabulary.Organization.Address, resultCompany.Company);
         }
 
         private void PopulateOrgAddressMetadata(IEntityMetadata metadata, CompanyHouseOrgAddressVocabulary vocab, CompanyNew resultCompany)
@@ -225,9 +264,9 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 
         private void PopulateContactMetadata(IEntityMetadata metadata, Contact resultItem)
         {
-            var code = new EntityCode(EntityType.Person, this.GetCodeOrigin(), resultItem.regNumber);
+            var code = new EntityCode(EntityType.Infrastructure.User, this.GetCodeOrigin(), resultItem.regNumber);
 
-            metadata.EntityType = EntityType.Person;
+            metadata.EntityType = EntityType.Infrastructure.User;
             metadata.Name = resultItem.name.PrintIfAvailable();
             metadata.OriginEntityCode = code;
 
