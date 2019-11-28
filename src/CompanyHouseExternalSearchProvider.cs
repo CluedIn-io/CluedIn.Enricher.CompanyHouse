@@ -13,16 +13,20 @@ using System.Linq;
 using CluedIn.Core;
 using CluedIn.Core.Data;
 using CluedIn.Core.Data.Parts;
+using CluedIn.Core.Data.Relational;
+using CluedIn.Core.ExternalSearch;
+using CluedIn.Core.Providers;
 using CluedIn.ExternalSearch.Providers.CompanyHouse.Vocabularies;
 using CluedIn.ExternalSearch.Filters;
 using CluedIn.Crawling.Helpers;
 using CluedIn.ExternalSearch.Providers.CompanyHouse.Model;
+using EntityType = CluedIn.Core.Data.EntityType;
 
 namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 {
     /// <summary>The clear bit external search provider.</summary>
     /// <seealso cref="CluedIn.ExternalSearch.ExternalSearchProviderBase" />
-    public class CompanyHouseExternalSearchProvider : ExternalSearchProviderBase
+    public class CompanyHouseExternalSearchProvider : ExternalSearchProviderBase, IExtendedEnricherMetadata
     {
         /**********************************************************************************************************
          * CONSTRUCTORS
@@ -262,5 +266,13 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             metadata.Properties[vocab.AddressLine1] = address.address_line_1.PrintIfAvailable();
             metadata.Properties[vocab.AddressLine2] = address.address_line_2.PrintIfAvailable();
         }
+
+        public string Icon { get; } = "Resources.companyhouse.jpg";
+        public string Domain { get; } = "https://www.gov.uk/government/organisations/companies-house";
+        public string About { get; } = "Company house is an enricher which providers information on UK companies";
+        public AuthMethods AuthMethods { get; } = null;
+        public IEnumerable<Control> Properties { get; } = null;
+        public Guide Guide { get; } = null;
+        public IntegrationType Type { get; } = IntegrationType.Cloud;
     }
 }
