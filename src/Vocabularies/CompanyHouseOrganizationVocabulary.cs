@@ -28,7 +28,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse.Vocabularies
 
             AddGroup("Metadata", group =>
             {
-                CompanyNumber = group.Add(new VocabularyKey("companyNumber", VocabularyKeyDataType.Text, VocabularyKeyVisibility.Hidden));
+                CompanyNumber = group.Add(new VocabularyKey("companyNumber", VocabularyKeyDataType.Text));
                 Type = group.Add(new VocabularyKey("type", VocabularyKeyDataType.Text));
                 Charges = group.Add(new VocabularyKey("charges", VocabularyKeyDataType.Text));
                 CompanyStatus = group.Add(new VocabularyKey("companyStatus", VocabularyKeyDataType.Text));
