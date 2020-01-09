@@ -26,6 +26,50 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 {
     /// <summary>The clear bit external search provider.</summary>
     /// <seealso cref="CluedIn.ExternalSearch.ExternalSearchProviderBase" />
+    [Id("2A9E52AE-425B-4351-8AF5-6D374E8CC1A5")]
+    [Name("Company House Enricher")]
+    [EnrichSource("www.companyhouse.com")]
+    [LookupEntityTypes("/Organization")]
+    [ReturnedEntityTypes("/Organization", "/Person")]
+    [LookupVocabularies("CluedIn.Core.Data.Vocabularies.Vocabularies.CluedInOrganization")]
+    [ReturnedVocabularies("CompanyHouseVocabulary.Organization", "CompanyHouseVocabulary.Person")]
+    [LookupVocabulariesKeys(
+        "CluedIn.Core.Data.Vocabularies.Vocabularies.CluedInOrganization.CodesCompanyHouse",
+        "CluedIn.Core.Data.Vocabularies.Vocabularies.CluedInOrganization.AddressCountryCode",
+        "CluedIn.Core.Data.Vocabularies.Vocabularies.CluedInOrganization.OrganizationName"
+        )
+    ]
+    [ReturnedVocabulariesKeys(
+            "CompanyHouseVocabulary.Organization.CompanyNumber",
+            "CompanyHouseVocabulary.Organization.Charges",
+            "CompanyHouseVocabulary.Organization.CompanyStatus",
+            "CompanyHouseVocabulary.Organization.Type",
+            "CompanyHouseVocabulary.Organization.Jurisdiction",
+            "CompanyHouseVocabulary.Organization.Has_been_liquidated",
+            "CompanyHouseVocabulary.Organization.Has_insolvency_history",
+            "CompanyHouseVocabulary.Organization.Registered_office_is_in_dispute",
+            "CompanyHouseOrgAddressVocabulary.AddressLine1",
+            "CompanyHouseOrgAddressVocabulary.AddressLine2",
+            "CompanyHouseOrgAddressVocabulary.Locality",
+            "CompanyHouseOrgAddressVocabulary.PostCode",
+            "CompanyHouseVocabulary.Person.Name",
+            "CompanyHouseVocabulary.Person.Officer_role",
+            "CompanyHouseVocabulary.Person.Appointed_on",
+            "CompanyHouseVocabulary.Person.Date_of_birth",
+            "CompanyHouseVocabulary.Person.Country_of_residence",
+            "CompanyHouseVocabulary.Person.Occupation",
+            "CompanyHouseVocabulary.Person.Nationality",
+            "CompanyHouseVocabulary.Person.Resigned_on",
+            "CompanyHousePersonAddressVocabulary.CareOf",
+            "CompanyHousePersonAddressVocabulary.Region",
+            "CompanyHousePersonAddressVocabulary.Postal_code",
+            "CompanyHousePersonAddressVocabulary.Premises",
+            "CompanyHousePersonAddressVocabulary.Country",
+            "CompanyHousePersonAddressVocabulary.Locality",
+            "CompanyHousePersonAddressVocabulary.AddressLine1",
+            "CompanyHousePersonAddressVocabulary.AddressLine2"
+        )
+    ]
     public class CompanyHouseExternalSearchProvider : ExternalSearchProviderBase, IExtendedEnricherMetadata
     {
         /**********************************************************************************************************
@@ -38,6 +82,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         public CompanyHouseExternalSearchProvider()
             : base(new Guid("{2A9E52AE-425B-4351-8AF5-6D374E8CC1A5}"), EntityType.Organization)
         {
+         
         }
 
         /**********************************************************************************************************
