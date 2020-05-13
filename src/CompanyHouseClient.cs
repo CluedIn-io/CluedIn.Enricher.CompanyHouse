@@ -20,7 +20,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         public List<CompanySearchResultItem> GetCompanies(string name)
         {
             this.request.Resource = $"search/companies?q={name}";
-            var result = this.client.ExecuteTaskAsync<CompanySearchResponse>(this.request).Result;
+            var result = this.client.ExecuteAsync<CompanySearchResponse>(this.request).Result;
             if (result.StatusCode != System.Net.HttpStatusCode.OK)
                 return null;
 
@@ -30,7 +30,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         public CompanyNew GetCompany(string companyNumber)
         {
             this.request.Resource = $"company/{companyNumber}";
-            var result = this.client.ExecuteTaskAsync<CompanyNew>(this.request).Result;
+            var result = this.client.ExecuteAsync<CompanyNew>(this.request).Result;
             if (result.StatusCode != System.Net.HttpStatusCode.OK)
                 return null;
 
@@ -40,7 +40,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         public List<Contact> GetOfficers(string companyNumber)
         {
             this.request.Resource = $"company/{companyNumber}/officers";
-            var result = this.client.ExecuteTaskAsync<ContactList>(this.request).Result;
+            var result = this.client.ExecuteAsync<ContactList>(this.request).Result;
             if (result.StatusCode != System.Net.HttpStatusCode.OK)
                 return null;
 
@@ -50,7 +50,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         public AppointmentResponse GetAppointment(string regNumber)
         {
             this.request.Resource = $"officers/{regNumber}/appointments";
-            var result = this.client.ExecuteTaskAsync<AppointmentResponse>(this.request).Result;
+            var result = this.client.ExecuteAsync<AppointmentResponse>(this.request).Result;
             if (result.StatusCode != System.Net.HttpStatusCode.OK)
                 return null;
 
@@ -60,7 +60,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         public OfficerResponse GetDisqualifiedNaturalResponse(string regNumber)
         {
             this.request.Resource = $"disqualified-officers/natural/{regNumber}";
-            var result = this.client.ExecuteTaskAsync<OfficerResponse>(this.request).Result;
+            var result = this.client.ExecuteAsync<OfficerResponse>(this.request).Result;
             if (result.StatusCode != System.Net.HttpStatusCode.OK)
                 return null;
 
@@ -70,7 +70,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         public OfficerResponse GetDisqualifiedCorporateResponse(string regNumber)
         {
             this.request.Resource = $"disqualified-officers/corporate/{regNumber}";
-            var result = this.client.ExecuteTaskAsync<OfficerResponse>(this.request).Result;
+            var result = this.client.ExecuteAsync<OfficerResponse>(this.request).Result;
             if (result.StatusCode != System.Net.HttpStatusCode.OK)
                 return null;
 
