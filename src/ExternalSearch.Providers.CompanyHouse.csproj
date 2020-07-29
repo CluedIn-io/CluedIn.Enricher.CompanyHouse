@@ -1,42 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <ProjectGuid>{DD41C500-E3DA-480C-9D5F-C55A903B584C}</ProjectGuid>
-    <RootNamespace>CluedIn.ExternalSearch.Providers.CompanyHouse</RootNamespace>
-    <AssemblyName>CluedIn.ExternalSearch.Providers.CompanyHouse</AssemblyName>
-    <TargetFramework>net452</TargetFramework>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <AssemblyTitle>ExternalSearch.Providers.CompanyHouse</AssemblyTitle>
-    <Company>CluedIn</Company>
-    <Product>ExternalSearch.Providers.CompanyHouse</Product>
-    <Copyright>Copyright (c) 2019 Clued In. All rights reserved.</Copyright>
-    <OutputPath>..\bin\$(Configuration)\net452\ServerComponent\</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-  </PropertyGroup>
-  <ItemGroup>
-    <None Remove="Resources\companyhouse.jpg" />
-  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\companyhouse.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CluedIn.ExternalSearch" Version="2.5.2" />
-    <PackageReference Include="EntityFramework" Version="6.1.2" />
-    <PackageReference Include="Microsoft.Net.Http" Version="2.2.29" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="RestSharp" Version="105.2.3" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.Net" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Net.Http.WebRequest" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
+    <PackageReference Include="CluedIn.Core" />
+    <PackageReference Include="CluedIn.ExternalSearch" />
   </ItemGroup>
 </Project>
