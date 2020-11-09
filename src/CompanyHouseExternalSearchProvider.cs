@@ -269,7 +269,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 
         public string Icon { get; } = "Resources.companyhouse.jpg";
         public string Domain { get; } = "https://www.gov.uk/government/organisations/companies-house";
-        public string About { get; } = "Company house is an enricher which providers information on UK companies";
+        public string About { get; } = "Company House is an enricher which provides information on UK companies";
         public AuthMethods AuthMethods { get; } = null;
         public IEnumerable<Control> Properties { get; } = null;
         public Guide Guide { get; } = null;
