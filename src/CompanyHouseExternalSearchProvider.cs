@@ -267,7 +267,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             metadata.Properties[vocab.AddressLine2] = address.address_line_2.PrintIfAvailable();
         }
 
-        public string Icon { get; } = "Resources.companyhouse.jpg";
+        public string Icon { get; } = "Resources.companyhouse.svg";
         public string Domain { get; } = "https://www.gov.uk/government/organisations/companies-house";
         public string About { get; } = "Company House is an enricher which provides information on UK companies";
         public AuthMethods AuthMethods { get; } = null;

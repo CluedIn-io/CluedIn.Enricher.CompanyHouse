@@ -1,6 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <EmbeddedResource Include="Resources\companyhouse.jpg" />
+    <None Remove="Resources\companyhouse.svg" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\companyhouse.svg" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CluedIn.Core" />
