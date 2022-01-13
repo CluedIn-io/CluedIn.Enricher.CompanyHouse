@@ -22,7 +22,7 @@ namespace ExternalSearch.CompanyHouse.Integration.Tests
         public void Test()
         {
             // Arrange
-            this.testContext = new TestContext();
+            testContext = new TestContext();
             var properties = new EntityMetadataPart();
             properties.Properties.Add(CluedIn.Core.Data.Vocabularies.Vocabularies.CluedInOrganization.Website, "http://sitecore.net");
             properties.Properties.Add(CluedIn.Core.Data.Vocabularies.Vocabularies.CluedInOrganization.AddressCountryCode, "uk");
@@ -40,11 +40,11 @@ namespace ExternalSearch.CompanyHouse.Integration.Tests
 
             externalSearchProvider.CallBase = true;
 
-            this.testContext.ProcessingHub.Setup(h => h.SendCommand(It.IsAny<ProcessClueCommand>())).Callback<IProcessingCommand>(c => clues.Add(((ProcessClueCommand)c).Clue));
+            testContext.ProcessingHub.Setup(h => h.SendCommand(It.IsAny<ProcessClueCommand>())).Callback<IProcessingCommand>(c => clues.Add(((ProcessClueCommand)c).Clue));
             //this.testContext.Container.Register(Component.For<IPropertyTranslationService>().UsingFactoryMethod(() => new PropertyTranslationService()));
-            this.testContext.Container.Register(Component.For<IExternalSearchProvider>().UsingFactoryMethod(() => externalSearchProvider.Object));
+            testContext.Container.Register(Component.For<IExternalSearchProvider>().UsingFactoryMethod(() => externalSearchProvider.Object));
 
-            var context = this.testContext.Context.ToProcessingContext();
+            var context = testContext.Context.ToProcessingContext();
             var command = new ExternalSearchCommand();
             var actor = new ExternalSearchProcessingAccessor(context.ApplicationContext);
             var workflow = new Mock<Workflow>(MockBehavior.Loose, context,
@@ -70,7 +70,7 @@ namespace ExternalSearch.CompanyHouse.Integration.Tests
             context.Workflow.ProcessStepResult(context, command);
 
             // Assert
-            this.testContext.ProcessingHub.Verify(h => h.SendCommand(It.IsAny<ProcessClueCommand>()), Times.AtLeastOnce);
+            testContext.ProcessingHub.Verify(h => h.SendCommand(It.IsAny<ProcessClueCommand>()), Times.AtLeastOnce);
 
             Assert.True(clues.Count > 0);
         }
