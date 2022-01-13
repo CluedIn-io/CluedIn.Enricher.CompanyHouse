@@ -52,7 +52,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExternalSearch.CompanyHouse
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExternalSearch.Providers.CompanyHouse", "src\ExternalSearch.Providers.CompanyHouse\ExternalSearch.Providers.CompanyHouse.csproj", "{0E62882E-46E7-4DCC-90BA-3A4E97263D10}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExternalSearch.Providers.CompanyHouse.Provider", "src\ExternalSearch.Providers.CompanyHouse.Provider\ExternalSearch.Providers.CompanyHouse.Provider.csproj", "{6744C85F-D12F-4246-8948-FD2CD2C2273C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Provider.ExternalSearch.CompanyHouse", "src\ExternalSearch.Providers.CompanyHouse.Provider\Provider.ExternalSearch.CompanyHouse.csproj", "{6744C85F-D12F-4246-8948-FD2CD2C2273C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
