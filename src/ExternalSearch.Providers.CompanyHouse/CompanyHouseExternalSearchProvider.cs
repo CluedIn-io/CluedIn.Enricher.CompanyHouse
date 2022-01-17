@@ -26,8 +26,10 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 {
     /// <summary>The clear bit external search provider.</summary>
     /// <seealso cref="CluedIn.ExternalSearch.ExternalSearchProviderBase" />
-    public class CompanyHouseExternalSearchProvider : ExternalSearchProviderBase, IExtendedEnricherMetadata
+    public class CompanyHouseExternalSearchProvider : ExternalSearchProviderBase, IExtendedEnricherMetadata, IConfigurableExternalSearchProvider
     {
+        private static readonly EntityType[] AcceptedEntityTypes = { EntityType.Organization };
+
         /**********************************************************************************************************
          * CONSTRUCTORS
          **********************************************************************************************************/
@@ -36,9 +38,11 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         /// Initializes a new instance of the <see cref="CompanyHouseExternalSearchProvider" /> class.
         /// </summary>
         public CompanyHouseExternalSearchProvider()
-            : base(new Guid("{2A9E52AE-425B-4351-8AF5-6D374E8CC1A5}"), EntityType.Organization)
+            : base(Constants.ProviderId, AcceptedEntityTypes)
         {
         }
+
+        
 
         /**********************************************************************************************************
          * METHODS
@@ -50,7 +54,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         /// <returns>The search queries.</returns>
         public override IEnumerable<IExternalSearchQuery> BuildQueries(ExecutionContext context, IExternalSearchRequest request)
         {
-            if (!this.Accepts(request.EntityMetaData.EntityType))
+            if (!Accepts(request.EntityMetaData.EntityType))
                 yield break;
 
             var existingResults = request.GetQueryResults<CompanyNew>(this).ToList();
@@ -59,14 +63,14 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             Func<string, bool> nameFilter = value => existingResults.Any(r => string.Equals(r.Data.company_name, value, StringComparison.InvariantCultureIgnoreCase));
 
             var entityType = request.EntityMetaData.EntityType;
-            var companyHouseNumber = request.QueryParameters.GetValue(CluedIn.Core.Data.Vocabularies.Vocabularies.CluedInOrganization.CodesCompanyHouse, new HashSet<string>());
+            var companyHouseNumber = request.QueryParameters.GetValue(Core.Data.Vocabularies.Vocabularies.CluedInOrganization.CodesCompanyHouse, new HashSet<string>());
 
-            var country = request.EntityMetaData.Properties.ContainsKey(CluedIn.Core.Data.Vocabularies.Vocabularies.CluedInOrganization.AddressCountryCode) ? request.EntityMetaData.Properties[CluedIn.Core.Data.Vocabularies.Vocabularies.CluedInOrganization.AddressCountryCode].ToLowerInvariant() : string.Empty;
+            var country = request.EntityMetaData.Properties.ContainsKey(Core.Data.Vocabularies.Vocabularies.CluedInOrganization.AddressCountryCode) ? request.EntityMetaData.Properties[Core.Data.Vocabularies.Vocabularies.CluedInOrganization.AddressCountryCode].ToLowerInvariant() : string.Empty;
 
             // TODO: Should put a filter here to only lookup UK based companies.
             if (country.Contains("uk") || country.Contains("gb"))
             {
-                var organizationName = request.QueryParameters.GetValue(CluedIn.Core.Data.Vocabularies.Vocabularies.CluedInOrganization.OrganizationName, new HashSet<string>());
+                var organizationName = request.QueryParameters.GetValue(Core.Data.Vocabularies.Vocabularies.CluedInOrganization.OrganizationName, new HashSet<string>());
 
                 if (!string.IsNullOrEmpty(request.EntityMetaData.Name))
                     organizationName.Add(request.EntityMetaData.Name);
@@ -89,7 +93,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         public static string Base64Encode(string plainText)
         {
             var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
-            return System.Convert.ToBase64String(plainTextBytes);
+            return Convert.ToBase64String(plainTextBytes);
         }
 
         /// <summary>Executes the search.</summary>
@@ -128,12 +132,12 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         {
             var resultItem = result.As<CompanyNew>();
 
-            var code = new EntityCode(EntityType.Organization, this.GetCodeOrigin(), resultItem.Data.company_number);
+            var code = new EntityCode(EntityType.Organization, GetCodeOrigin(), resultItem.Data.company_number);
 
             var clue = new Clue(code, context.Organization);
-            clue.Data.OriginProviderDefinitionId = this.Id;
+            clue.Data.OriginProviderDefinitionId = Id;
 
-            this.PopulateMetadata(clue.Data.EntityData, resultItem.Data);
+            PopulateMetadata(clue.Data.EntityData, resultItem.Data);
             yield return clue;
         }
 
@@ -145,7 +149,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         public override IEntityMetadata GetPrimaryEntityMetadata(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request)
         {
             var resultItem = result.As<CompanyNew>();
-            return this.CreateMetadata(resultItem);
+            return CreateMetadata(resultItem);
         }
 
         /// <summary>Gets the preview image.</summary>
@@ -165,7 +169,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         {
             var metadata = new EntityMetadataPart();
 
-            this.PopulateMetadata(metadata, resultItem.Data);
+            PopulateMetadata(metadata, resultItem.Data);
 
             return metadata;
         }
@@ -182,14 +186,14 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         /// <param name="resultCompany">The result item.</param>
         private void PopulateMetadata(IEntityMetadata metadata, CompanyNew resultCompany)
         {
-            var code = new EntityCode(EntityType.Organization, this.GetCodeOrigin(), resultCompany.company_number);
+            var code = new EntityCode(EntityType.Organization, GetCodeOrigin(), resultCompany.company_number);
 
             metadata.EntityType = EntityType.Organization;
 
             metadata.OriginEntityCode = code;
             metadata.Name = resultCompany.original_query_name.PrintIfAvailable();
             if (!string.IsNullOrEmpty(resultCompany.company_name))
-                metadata.Codes.Add(new EntityCode(EntityType.Organization, this.GetCodeOrigin(), resultCompany.company_name));
+                metadata.Codes.Add(new EntityCode(EntityType.Organization, GetCodeOrigin(), resultCompany.company_name));
 
             metadata.DisplayName = resultCompany.company_name.PrintIfAvailable();
 
@@ -215,7 +219,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             }
 
             if (resultCompany.registered_office_address != null)
-                this.PopulateOrgAddressMetadata(metadata, CompanyHouseVocabulary.Organization.Address, resultCompany);
+                PopulateOrgAddressMetadata(metadata, CompanyHouseVocabulary.Organization.Address, resultCompany);
         }
 
         private void PopulateOrgAddressMetadata(IEntityMetadata metadata, CompanyHouseOrgAddressVocabulary vocab, CompanyNew resultCompany)
@@ -229,7 +233,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 
         private void PopulateContactMetadata(IEntityMetadata metadata, Contact resultItem)
         {
-            var code = new EntityCode(EntityType.Person, this.GetCodeOrigin(), resultItem.regNumber);
+            var code = new EntityCode(EntityType.Person, GetCodeOrigin(), resultItem.regNumber);
 
             metadata.EntityType = EntityType.Person;
             metadata.Name = resultItem.name.PrintIfAvailable();
@@ -241,7 +245,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 
             if (resultItem.address != null)
             {
-                this.PopulatePersonAddressMetadata(metadata, CompanyHouseVocabulary.Person.Address, resultItem.address);
+                PopulatePersonAddressMetadata(metadata, CompanyHouseVocabulary.Person.Address, resultItem.address);
             }
 
             if (resultItem.date_of_birth != null)
@@ -267,12 +271,43 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             metadata.Properties[vocab.AddressLine2] = address.address_line_2.PrintIfAvailable();
         }
 
-        public string Icon { get; } = "Resources.companyhouse.svg";
-        public string Domain { get; } = "https://www.gov.uk/government/organisations/companies-house";
-        public string About { get; } = "Company House is an enricher which provides information on UK companies";
-        public AuthMethods AuthMethods { get; } = null;
-        public IEnumerable<Control> Properties { get; } = null;
-        public Guide Guide { get; } = null;
-        public IntegrationType Type { get; } = IntegrationType.Cloud;
+        public IEnumerable<EntityType> Accepts(IDictionary<string, object> config, IProvider provider)
+        {
+            return AcceptedEntityTypes;
+        }
+
+        public IEnumerable<IExternalSearchQuery> BuildQueries(ExecutionContext context, IExternalSearchRequest request, IDictionary<string, object> config, IProvider provider)
+        {
+            return BuildQueries(context, request);
+        }
+
+        public IEnumerable<IExternalSearchQueryResult> ExecuteSearch(ExecutionContext context, IExternalSearchQuery query, IDictionary<string, object> config, IProvider provider)
+        {
+            return ExecuteSearch(context, query);
+        }
+
+        public IEnumerable<Clue> BuildClues(ExecutionContext context, IExternalSearchQuery query, IExternalSearchQueryResult result, IExternalSearchRequest request, IDictionary<string, object> config, IProvider provider)
+        {
+            return BuildClues(context, query, result, request);
+        }
+
+        public IEntityMetadata GetPrimaryEntityMetadata(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request, IDictionary<string, object> config, IProvider provider)
+        {
+            return GetPrimaryEntityMetadata(context, result, request);
+        }
+
+        public IPreviewImage GetPrimaryEntityPreviewImage(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request, IDictionary<string, object> config, IProvider provider)
+        {
+            return GetPrimaryEntityPreviewImage(context, result, request);
+        }
+
+        public string Icon { get; } = Constants.Icon;
+        public string Domain { get; } = Constants.Domain;
+        public string About { get; } = Constants.About;
+
+        public AuthMethods AuthMethods { get; } = Constants.AuthMethods;
+        public IEnumerable<Control> Properties { get; } = Constants.Properties;
+        public Guide Guide { get; } = Constants.Guide;
+        public IntegrationType Type { get; } = Constants.IntegrationType;
     }
 }
