@@ -42,7 +42,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         {
         }
 
-        
+
 
         /**********************************************************************************************************
          * METHODS
@@ -54,7 +54,21 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         /// <returns>The search queries.</returns>
         public override IEnumerable<IExternalSearchQuery> BuildQueries(ExecutionContext context, IExternalSearchRequest request)
         {
-            if (!Accepts(request.EntityMetaData.EntityType))
+            foreach (var externalSearchQuery in InternalBuildQueries(context, request))
+            {
+                yield return externalSearchQuery;
+            }
+        }
+        private IEnumerable<IExternalSearchQuery> InternalBuildQueries(ExecutionContext context, IExternalSearchRequest request, IDictionary<string, object> config = null)
+        {
+            if (config.TryGetValue(Constants.KeyName.AcceptedEntityType, out var customType) && !string.IsNullOrWhiteSpace(customType.ToString()))
+            {
+                if (!request.EntityMetaData.EntityType.Is(customType.ToString()))
+                {
+                    yield break;
+                }
+            }
+            else if (!Accepts(request.EntityMetaData.EntityType))
                 yield break;
 
             var existingResults = request.GetQueryResults<CompanyNew>(this).ToList();
@@ -63,15 +77,37 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             Func<string, bool> nameFilter = value => existingResults.Any(r => string.Equals(r.Data.company_name, value, StringComparison.InvariantCultureIgnoreCase));
 
             var entityType = request.EntityMetaData.EntityType;
-            var companyHouseNumber = request.QueryParameters.GetValue(Core.Data.Vocabularies.Vocabularies.CluedInOrganization.CodesCompanyHouse, new HashSet<string>());
+            var companyHouseNumber = new HashSet<string>();
+            string country;
+            var organizationName = new HashSet<string>();
 
-            var country = request.EntityMetaData.Properties.ContainsKey(Core.Data.Vocabularies.Vocabularies.CluedInOrganization.AddressCountryCode) ? request.EntityMetaData.Properties[Core.Data.Vocabularies.Vocabularies.CluedInOrganization.AddressCountryCode].ToLowerInvariant() : string.Empty;
-
+            if (config.TryGetValue(Constants.KeyName.CompanyHouseNumberKey, out var customVocabKeyCompanyHouseNr) && !string.IsNullOrWhiteSpace(customVocabKeyCompanyHouseNr.ToString()))
+            {
+                companyHouseNumber = request.QueryParameters.GetValue<string, HashSet<string>>(config[Constants.KeyName.CompanyHouseNumberKey].ToString(), new HashSet<string>());
+            }
+            else
+            {
+                companyHouseNumber = request.QueryParameters.GetValue(Core.Data.Vocabularies.Vocabularies.CluedInOrganization.CodesCompanyHouse, new HashSet<string>());
+            }
+            if (config.TryGetValue(Constants.KeyName.CountryKey, out var customVocabKeyCountry) && !string.IsNullOrWhiteSpace(customVocabKeyCountry.ToString()))
+            {
+                country = request.EntityMetaData.Properties.ContainsKey(Constants.KeyName.CompanyHouseNumberKey) ? request.EntityMetaData.Properties[Constants.KeyName.CompanyHouseNumberKey].ToLowerInvariant() : string.Empty;
+            }
+            else
+            {
+                country = request.EntityMetaData.Properties.ContainsKey(Core.Data.Vocabularies.Vocabularies.CluedInOrganization.AddressCountryCode) ? request.EntityMetaData.Properties[Core.Data.Vocabularies.Vocabularies.CluedInOrganization.AddressCountryCode].ToLowerInvariant() : string.Empty;
+            } 
             // TODO: Should put a filter here to only lookup UK based companies.
             if (country.Contains("uk") || country.Contains("gb"))
             {
-                var organizationName = request.QueryParameters.GetValue(Core.Data.Vocabularies.Vocabularies.CluedInOrganization.OrganizationName, new HashSet<string>());
-
+                if (config.TryGetValue(Constants.KeyName.OrgNameKey, out var customVocabKeyOrgName) && !string.IsNullOrWhiteSpace(customVocabKeyOrgName.ToString()))
+                {
+                    organizationName = request.QueryParameters.GetValue<string, HashSet<string>>(config[Constants.KeyName.OrgNameKey].ToString(), new HashSet<string>());
+                }
+                else
+                {
+                    organizationName = request.QueryParameters.GetValue(Core.Data.Vocabularies.Vocabularies.CluedInOrganization.OrganizationName, new HashSet<string>());
+                }
                 if (!string.IsNullOrEmpty(request.EntityMetaData.Name))
                     organizationName.Add(request.EntityMetaData.Name);
                 if (!string.IsNullOrEmpty(request.EntityMetaData.DisplayName))
