@@ -81,7 +81,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             string country;
             var organizationName = new HashSet<string>();
 
-            if (config.TryGetValue(Constants.KeyName.CompanyHouseNumberKey, out var customVocabKeyCompanyHouseNr) && !string.IsNullOrWhiteSpace(customVocabKeyCompanyHouseNr.ToString()))
+            if (config.TryGetValue(Constants.KeyName.CompanyHouseNumberKey, out var customVocabKeyCompanyHouseNr) && !string.IsNullOrWhiteSpace(customVocabKeyCompanyHouseNr?.ToString()))
             {
                 companyHouseNumber = request.QueryParameters.GetValue<string, HashSet<string>>(config[Constants.KeyName.CompanyHouseNumberKey].ToString(), new HashSet<string>());
             }
@@ -89,7 +89,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             {
                 companyHouseNumber = request.QueryParameters.GetValue(Core.Data.Vocabularies.Vocabularies.CluedInOrganization.CodesCompanyHouse, new HashSet<string>());
             }
-            if (config.TryGetValue(Constants.KeyName.CountryKey, out var customVocabKeyCountry) && !string.IsNullOrWhiteSpace(customVocabKeyCountry.ToString()))
+            if (config.TryGetValue(Constants.KeyName.CountryKey, out var customVocabKeyCountry) && !string.IsNullOrWhiteSpace(customVocabKeyCountry?.ToString()))
             {
                 country = request.EntityMetaData.Properties.ContainsKey(Constants.KeyName.CompanyHouseNumberKey) ? request.EntityMetaData.Properties[Constants.KeyName.CompanyHouseNumberKey].ToLowerInvariant() : string.Empty;
             }
@@ -100,7 +100,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             // TODO: Should put a filter here to only lookup UK based companies.
             if (country.Contains("uk") || country.Contains("gb"))
             {
-                if (config.TryGetValue(Constants.KeyName.OrgNameKey, out var customVocabKeyOrgName) && !string.IsNullOrWhiteSpace(customVocabKeyOrgName.ToString()))
+                if (config.TryGetValue(Constants.KeyName.OrgNameKey, out var customVocabKeyOrgName) && !string.IsNullOrWhiteSpace(customVocabKeyOrgName?.ToString()))
                 {
                     organizationName = request.QueryParameters.GetValue<string, HashSet<string>>(config[Constants.KeyName.OrgNameKey].ToString(), new HashSet<string>());
                 }
