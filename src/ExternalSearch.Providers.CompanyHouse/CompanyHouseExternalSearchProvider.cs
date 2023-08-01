@@ -79,7 +79,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 
                 if (organizationName != null)
                 {
-                    var values = organizationName.Select(NameNormalization.Normalize).ToHashSetEx();
+                    var values = organizationName.Select(NameNormalization.Normalize).ToHashSet();
 
                     foreach (var value in values.Where(v => !nameFilter(v)))
                         yield return new ExternalSearchQuery(this, entityType, ExternalSearchQueryParameter.Name, value);
