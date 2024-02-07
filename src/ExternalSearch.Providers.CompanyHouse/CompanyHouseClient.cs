@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Text;
 using CluedIn.ExternalSearch.Providers.CompanyHouse.Model;
 using RestSharp;
 
@@ -6,82 +9,66 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 {
     public class CompanyHouseClient
     {
-        private RestClient client;
-        private RestRequest request;
+        private readonly RestClient _client;
+        private readonly RestRequest _request;
 
-        public CompanyHouseClient()
+        public CompanyHouseClient(CompanyHouseExternalSearchJobData jobData)
         {
-            client = new RestClient("https://api.companieshouse.gov.uk");
-            request = new RestRequest();
-            request.Method = Method.GET;
-            request.AddHeader("Authorization", "Basic " + Base64Encode("_Y-9-pOnf-c0o4_bIZpjGASw8FYrNP-nVK2DvEbn"));
+            _client = new RestClient("https://api.companieshouse.gov.uk");
+            _request = new RestRequest { Method = Method.GET };
+            _request.AddHeader("Authorization", "Basic " + Base64Encode(jobData.ApiKey));
         }
 
         public List<CompanySearchResultItem> GetCompanies(string name)
         {
-            request.Resource = $"search/companies?q={name}";
-            var result = client.ExecuteAsync<CompanySearchResponse>(request).Result;
-            if (result.StatusCode != System.Net.HttpStatusCode.OK)
-                return null;
-
-            return result.Data.items;
+            _request.Resource = $"search/companies?q={name}";
+            var result = _client.ExecuteAsync<CompanySearchResponse>(_request).Result;
+            return result.StatusCode != HttpStatusCode.OK ? null : result.Data.items;
         }
 
         public CompanyNew GetCompany(string companyNumber)
         {
-            request.Resource = $"company/{companyNumber}";
-            var result = client.ExecuteAsync<CompanyNew>(request).Result;
-            if (result.StatusCode != System.Net.HttpStatusCode.OK)
-                return null;
-
-            return result.Data;
+            _request.Resource = $"company/{companyNumber}";
+            var result = _client.ExecuteAsync<CompanyNew>(_request).Result;
+            return result.StatusCode != HttpStatusCode.OK ? null : result.Data;
         }
 
+        // TODO: not used
         public List<Contact> GetOfficers(string companyNumber)
         {
-            request.Resource = $"company/{companyNumber}/officers";
-            var result = client.ExecuteAsync<ContactList>(request).Result;
-            if (result.StatusCode != System.Net.HttpStatusCode.OK)
-                return null;
-
-            return result.Data?.items;
+            _request.Resource = $"company/{companyNumber}/officers";
+            var result = _client.ExecuteAsync<ContactList>(_request).Result;
+            return result.StatusCode != HttpStatusCode.OK ? null : result.Data?.items;
         }
 
+        // TODO: not used
         public AppointmentResponse GetAppointment(string regNumber)
         {
-            request.Resource = $"officers/{regNumber}/appointments";
-            var result = client.ExecuteAsync<AppointmentResponse>(request).Result;
-            if (result.StatusCode != System.Net.HttpStatusCode.OK)
-                return null;
-
-            return result.Data;
+            _request.Resource = $"officers/{regNumber}/appointments";
+            var result = _client.ExecuteAsync<AppointmentResponse>(_request).Result;
+            return result.StatusCode != HttpStatusCode.OK ? null : result.Data;
         }
 
+        // TODO: not used
         public OfficerResponse GetDisqualifiedNaturalResponse(string regNumber)
         {
-            request.Resource = $"disqualified-officers/natural/{regNumber}";
-            var result = client.ExecuteAsync<OfficerResponse>(request).Result;
-            if (result.StatusCode != System.Net.HttpStatusCode.OK)
-                return null;
-
-            return result.Data;
+            _request.Resource = $"disqualified-officers/natural/{regNumber}";
+            var result = _client.ExecuteAsync<OfficerResponse>(_request).Result;
+            return result.StatusCode != HttpStatusCode.OK ? null : result.Data;
         }
 
+        // TODO: not used
         public OfficerResponse GetDisqualifiedCorporateResponse(string regNumber)
         {
-            request.Resource = $"disqualified-officers/corporate/{regNumber}";
-            var result = client.ExecuteAsync<OfficerResponse>(request).Result;
-            if (result.StatusCode != System.Net.HttpStatusCode.OK)
-                return null;
-
-            return result.Data;
+            _request.Resource = $"disqualified-officers/corporate/{regNumber}";
+            var result = _client.ExecuteAsync<OfficerResponse>(_request).Result;
+            return result.StatusCode != HttpStatusCode.OK ? null : result.Data;
         }
-
 
         public static string Base64Encode(string plainText)
         {
-            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
-            return System.Convert.ToBase64String(plainTextBytes);
+            var plainTextBytes = Encoding.UTF8.GetBytes(plainText);
+            return Convert.ToBase64String(plainTextBytes);
         }
     }
 }
