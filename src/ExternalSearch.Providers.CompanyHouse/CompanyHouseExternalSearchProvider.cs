@@ -30,7 +30,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
     public class CompanyHouseExternalSearchProvider : ExternalSearchProviderBase, IExtendedEnricherMetadata,
         IConfigurableExternalSearchProvider
     {
-        private static readonly EntityType[] AcceptedEntityTypes = { };
+        private static readonly EntityType[] DefaultAcceptedEntityTypes = { };
 
         /**********************************************************************************************************
          * CONSTRUCTORS
@@ -40,13 +40,29 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         ///     Initializes a new instance of the <see cref="CompanyHouseExternalSearchProvider" /> class.
         /// </summary>
         public CompanyHouseExternalSearchProvider()
-            : base(Constants.ProviderId, AcceptedEntityTypes)
+            : base(Constants.ProviderId, DefaultAcceptedEntityTypes)
         {
         }
 
-        public IEnumerable<EntityType> Accepts(IDictionary<string, object> config, IProvider provider)
+        public IEnumerable<EntityType> Accepts(IDictionary<string, object> config, IProvider provider) => Accepts(config);
+
+        private IEnumerable<EntityType> Accepts(IDictionary<string, object> config)
         {
-            return AcceptedEntityTypes;
+            if (config.TryGetValue(Constants.KeyName.AcceptedEntityType, out var acceptedEntityTypeObj) && acceptedEntityTypeObj is string acceptedEntityType && !string.IsNullOrWhiteSpace(acceptedEntityType))
+            {
+                // If configured, only accept the configured entity types
+                return new EntityType[] { acceptedEntityType };
+            }
+
+            // Fallback to default accepted entity types
+            return DefaultAcceptedEntityTypes;
+        }
+
+        private bool Accepts(IDictionary<string, object> config, EntityType entityTypeToEvaluate)
+        {
+            var configurableAcceptedEntityTypes = this.Accepts(config).ToArray();
+
+            return configurableAcceptedEntityTypes.Any(entityTypeToEvaluate.Is);
         }
 
         public IEnumerable<IExternalSearchQuery> BuildQueries(ExecutionContext context, IExternalSearchRequest request,
@@ -87,19 +103,28 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             IExternalSearchQueryResult result, IExternalSearchRequest request, IDictionary<string, object> config,
             IProvider provider)
         {
-            return BuildClues(context, query, result, request);
+            var resultItem = result.As<CompanyNew>();
+
+            var code = new EntityCode(EntityType.Organization, GetCodeOrigin(), resultItem.Data.company_number);
+
+            var clue = new Clue(code, context.Organization) { Data = { OriginProviderDefinitionId = Id } };
+            clue.Data.EntityData.Codes.Add(request.EntityMetaData.OriginEntityCode);
+
+            PopulateMetadata(clue.Data.EntityData, resultItem.Data);
+            yield return clue;
         }
 
         public IEntityMetadata GetPrimaryEntityMetadata(ExecutionContext context, IExternalSearchQueryResult result,
             IExternalSearchRequest request, IDictionary<string, object> config, IProvider provider)
         {
-            return GetPrimaryEntityMetadata(context, result, request);
+            var resultItem = result.As<CompanyNew>();
+            return CreateMetadata(resultItem);
         }
 
         public IPreviewImage GetPrimaryEntityPreviewImage(ExecutionContext context, IExternalSearchQueryResult result,
             IExternalSearchRequest request, IDictionary<string, object> config, IProvider provider)
         {
-            return GetPrimaryEntityPreviewImage(context, result, request);
+            return null;
         }
 
         public string Icon { get; } = Constants.Icon;
@@ -138,7 +163,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
                     yield break;
                 }
             }
-            else if (!Accepts(request.EntityMetaData.EntityType))
+            else if (!Accepts(config, request.EntityMetaData.EntityType))
             {
                 yield break;
             }
@@ -235,62 +260,16 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             return Convert.ToBase64String(plainTextBytes);
         }
 
-        /// <summary>Executes the search.</summary>
-        /// <param name="context">The context.</param>
-        /// <param name="query">The query.</param>
-        /// <returns>The results.</returns>
-        public override IEnumerable<IExternalSearchQueryResult> ExecuteSearch(ExecutionContext context,
-            IExternalSearchQuery query)
-        {
-            return Enumerable.Empty<IExternalSearchQueryResult>();
-        }
+        public override bool Accepts(EntityType entityType) => throw new NotSupportedException();
 
-        /// <summary>Builds the clues.</summary>
-        /// <param name="context">The context.</param>
-        /// <param name="query">The query.</param>
-        /// <param name="result">The result.</param>
-        /// <param name="request">The request.</param>
-        /// <returns>The clues.</returns>
-        public override IEnumerable<Clue> BuildClues(ExecutionContext context, IExternalSearchQuery query,
-            IExternalSearchQueryResult result, IExternalSearchRequest request)
-        {
-            var resultItem = result.As<CompanyNew>();
+        public override IEnumerable<IExternalSearchQueryResult> ExecuteSearch(ExecutionContext context, IExternalSearchQuery query) => throw new NotSupportedException();
+     
+        public override IEnumerable<Clue> BuildClues(ExecutionContext context, IExternalSearchQuery query, IExternalSearchQueryResult result, IExternalSearchRequest request) => throw new NotSupportedException();
 
-            var code = new EntityCode(EntityType.Organization, GetCodeOrigin(), resultItem.Data.company_number);
+        public override IEntityMetadata GetPrimaryEntityMetadata(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request) => throw new NotSupportedException();
 
-            var clue = new Clue(code, context.Organization) { Data = { OriginProviderDefinitionId = Id } };
-            clue.Data.EntityData.Codes.Add(request.EntityMetaData.OriginEntityCode);
+        public override IPreviewImage GetPrimaryEntityPreviewImage(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request) => throw new NotSupportedException();
 
-            PopulateMetadata(clue.Data.EntityData, resultItem.Data);
-            yield return clue;
-        }
-
-        /// <summary>Gets the primary entity metadata.</summary>
-        /// <param name="context">The context.</param>
-        /// <param name="result">The result.</param>
-        /// <param name="request">The request.</param>
-        /// <returns>The primary entity metadata.</returns>
-        public override IEntityMetadata GetPrimaryEntityMetadata(ExecutionContext context,
-            IExternalSearchQueryResult result, IExternalSearchRequest request)
-        {
-            var resultItem = result.As<CompanyNew>();
-            return CreateMetadata(resultItem);
-        }
-
-        /// <summary>Gets the preview image.</summary>
-        /// <param name="context">The context.</param>
-        /// <param name="result">The result.</param>
-        /// <param name="request">The request.</param>
-        /// <returns>The preview image.</returns>
-        public override IPreviewImage GetPrimaryEntityPreviewImage(ExecutionContext context,
-            IExternalSearchQueryResult result, IExternalSearchRequest request)
-        {
-            return null;
-        }
-
-        /// <summary>Creates the metadata.</summary>
-        /// <param name="resultItem">The result item.</param>
-        /// <returns>The metadata.</returns>
         private IEntityMetadata CreateMetadata(IExternalSearchQueryResult<CompanyNew> resultItem)
         {
             var metadata = new EntityMetadataPart();
