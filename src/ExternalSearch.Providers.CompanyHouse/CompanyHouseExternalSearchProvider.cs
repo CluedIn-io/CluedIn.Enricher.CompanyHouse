@@ -210,39 +210,35 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
                         : string.Empty;
             }
 
-            // TODO: Should put a filter here to only lookup UK based companies.
-            if (country.ToLowerInvariant().Contains("uk") || country.ToLowerInvariant().Contains("gb"))
+            HashSet<string> organizationName;
+            if (!string.IsNullOrWhiteSpace(jobData.OrgNameKey))
             {
-                HashSet<string> organizationName;
-                if (!string.IsNullOrWhiteSpace(jobData.OrgNameKey))
-                {
-                    organizationName =
-                        request.QueryParameters.GetValue<string, HashSet<string>>(jobData.OrgNameKey, new HashSet<string>());
-                }
-                else
-                {
-                    organizationName = request.QueryParameters.GetValue(
-                        Core.Data.Vocabularies.Vocabularies.CluedInOrganization.OrganizationName, new HashSet<string>());
-                }
+                organizationName =
+                    request.QueryParameters.GetValue<string, HashSet<string>>(jobData.OrgNameKey, new HashSet<string>());
+            }
+            else
+            {
+                organizationName = request.QueryParameters.GetValue(
+                    Core.Data.Vocabularies.Vocabularies.CluedInOrganization.OrganizationName, new HashSet<string>());
+            }
 
-                if (!string.IsNullOrEmpty(request.EntityMetaData.Name))
-                {
-                    organizationName.Add(request.EntityMetaData.Name);
-                }
+            if (!string.IsNullOrEmpty(request.EntityMetaData.Name))
+            {
+                organizationName.Add(request.EntityMetaData.Name);
+            }
 
-                if (!string.IsNullOrEmpty(request.EntityMetaData.DisplayName))
-                {
-                    organizationName.Add(request.EntityMetaData.DisplayName);
-                }
+            if (!string.IsNullOrEmpty(request.EntityMetaData.DisplayName))
+            {
+                organizationName.Add(request.EntityMetaData.DisplayName);
+            }
 
-                if (organizationName != null)
-                {
-                    var values = organizationName.Select(NameNormalization.Normalize).ToHashSet();
+            if (organizationName != null)
+            {
+                var values = organizationName.Select(NameNormalization.Normalize).ToHashSet();
 
-                    foreach (var value in values.Where(v => !nameFilter(v)))
-                    {
-                        yield return new ExternalSearchQuery(this, entityType, ExternalSearchQueryParameter.Name, value);
-                    }
+                foreach (var value in values.Where(v => !nameFilter(v)))
+                {
+                    yield return new ExternalSearchQuery(this, entityType, ExternalSearchQueryParameter.Name, value);
                 }
             }
 
