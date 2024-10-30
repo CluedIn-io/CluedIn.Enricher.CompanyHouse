@@ -292,7 +292,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             metadata.EntityType = request.EntityMetaData.EntityType;
 
             metadata.OriginEntityCode = code;
-            metadata.Name = resultCompany.original_query_name.PrintIfAvailable();
+            metadata.Name = request.EntityMetaData.Name;
             metadata.Codes.Add(request.EntityMetaData.OriginEntityCode);
             metadata.Codes.Add(code);
             if (!string.IsNullOrEmpty(resultCompany.company_name))
