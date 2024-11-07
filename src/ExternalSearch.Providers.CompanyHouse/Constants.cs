@@ -49,6 +49,13 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
                     type = "input",
                     isRequired = false,
                     name = KeyName.OrgNameKey
+                },
+                new()
+                {
+                    displayName = "Skip Entity Code Creation (Company House Number)",
+                    type = "checkbox",
+                    isRequired = false,
+                    name =  KeyName.SkipEntityCodeCreation,
                 }
             }
         };
@@ -75,6 +82,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             public const string CompanyHouseNumberKey = nameof(CompanyHouseNumberKey);
             public const string CountryKey = nameof(CountryKey);
             public const string OrgNameKey = nameof(OrgNameKey);
+            public const string SkipEntityCodeCreation = nameof(SkipEntityCodeCreation);
         }
     }
 }

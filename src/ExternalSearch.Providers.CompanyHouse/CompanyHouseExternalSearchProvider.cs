@@ -21,6 +21,7 @@ using CluedIn.Crawling.Helpers;
 using CluedIn.ExternalSearch.Filters;
 using CluedIn.ExternalSearch.Providers.CompanyHouse.Model;
 using CluedIn.ExternalSearch.Providers.CompanyHouse.Vocabularies;
+using Neo4j.Driver;
 using EntityType = CluedIn.Core.Data.EntityType;
 
 namespace CluedIn.ExternalSearch.Providers.CompanyHouse
@@ -105,12 +106,17 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         {
             var resultItem = result.As<CompanyNew>();
 
-            var code = new EntityCode(EntityType.Organization, GetCodeOrigin(), resultItem.Data.company_number);
 
-            var clue = new Clue(code, context.Organization) { Data = { OriginProviderDefinitionId = Id } };
-            clue.Data.EntityData.Codes.Add(request.EntityMetaData.OriginEntityCode);
+            var clue = new Clue(request.EntityMetaData.OriginEntityCode, context.Organization) { Data = { OriginProviderDefinitionId = Id } };
 
-            PopulateMetadata(clue.Data.EntityData, resultItem.Data, request);
+            var code = new EntityCode(request.EntityMetaData.EntityType, GetCodeOrigin(), resultItem.Data.company_number);
+            var jobData = new CompanyHouseExternalSearchJobData(config);
+            if (!jobData.SkipEntityCodeCreation)
+            {
+                clue.Data.EntityData.Codes.Add(code);
+            }
+
+            PopulateMetadata(clue.Data.EntityData, resultItem.Data, request, config);
             yield return clue;
         }
 
@@ -118,7 +124,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             IExternalSearchRequest request, IDictionary<string, object> config, IProvider provider)
         {
             var resultItem = result.As<CompanyNew>();
-            return CreateMetadata(resultItem, request);
+            return CreateMetadata(resultItem, request, config);
         }
 
         public IPreviewImage GetPrimaryEntityPreviewImage(ExecutionContext context, IExternalSearchQueryResult result,
@@ -266,11 +272,11 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 
         public override IPreviewImage GetPrimaryEntityPreviewImage(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request) => throw new NotSupportedException();
 
-        private IEntityMetadata CreateMetadata(IExternalSearchQueryResult<CompanyNew> resultItem, IExternalSearchRequest request)
+        private IEntityMetadata CreateMetadata(IExternalSearchQueryResult<CompanyNew> resultItem, IExternalSearchRequest request, IDictionary<string, object> config)
         {
             var metadata = new EntityMetadataPart();
 
-            PopulateMetadata(metadata, resultItem.Data, request);
+            PopulateMetadata(metadata, resultItem.Data, request, config);
 
             return metadata;
         }
@@ -285,19 +291,23 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         /// <summary>Populates the metadata.</summary>
         /// <param name="metadata">The metadata.</param>
         /// <param name="resultCompany">The result item.</param>
-        private void PopulateMetadata(IEntityMetadata metadata, CompanyNew resultCompany, IExternalSearchRequest request)
+        private void PopulateMetadata(IEntityMetadata metadata, CompanyNew resultCompany, IExternalSearchRequest request, IDictionary<string, object> config)
         {
-            var code = new EntityCode(EntityType.Organization, GetCodeOrigin(), resultCompany.company_number);
+            var jobData = new CompanyHouseExternalSearchJobData(config);
+            var code = jobData.SkipEntityCodeCreation ? request.EntityMetaData.OriginEntityCode : new EntityCode(request.EntityMetaData.EntityType, GetCodeOrigin(), resultCompany.company_number);
 
             metadata.EntityType = request.EntityMetaData.EntityType;
-
             metadata.OriginEntityCode = code;
             metadata.Name = request.EntityMetaData.Name;
-            metadata.Codes.Add(request.EntityMetaData.OriginEntityCode);
-            metadata.Codes.Add(code);
-            if (!string.IsNullOrEmpty(resultCompany.company_name))
+
+            if (!jobData.SkipEntityCodeCreation)
             {
-                metadata.Codes.Add(new EntityCode(EntityType.Organization, GetCodeOrigin(), resultCompany.company_name));
+                metadata.Codes.Add(code);
+            }
+
+            if (!jobData.SkipEntityCodeCreation && !string.IsNullOrEmpty(resultCompany.company_name))
+            {
+                metadata.Codes.Add(new EntityCode(request.EntityMetaData.EntityType, GetCodeOrigin(), resultCompany.company_name));
             }
 
             metadata.DisplayName = resultCompany.company_name.PrintIfAvailable();
