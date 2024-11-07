@@ -106,15 +106,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         {
             var resultItem = result.As<CompanyNew>();
 
-
             var clue = new Clue(request.EntityMetaData.OriginEntityCode, context.Organization) { Data = { OriginProviderDefinitionId = Id } };
-
-            var code = new EntityCode(request.EntityMetaData.EntityType, GetCodeOrigin(), resultItem.Data.company_number);
-            var jobData = new CompanyHouseExternalSearchJobData(config);
-            if (!jobData.SkipEntityCodeCreation)
-            {
-                clue.Data.EntityData.Codes.Add(code);
-            }
 
             PopulateMetadata(clue.Data.EntityData, resultItem.Data, request, config);
             yield return clue;
@@ -294,18 +286,18 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         private void PopulateMetadata(IEntityMetadata metadata, CompanyNew resultCompany, IExternalSearchRequest request, IDictionary<string, object> config)
         {
             var jobData = new CompanyHouseExternalSearchJobData(config);
-            var code = jobData.SkipEntityCodeCreation ? request.EntityMetaData.OriginEntityCode : new EntityCode(request.EntityMetaData.EntityType, GetCodeOrigin(), resultCompany.company_number);
+            var code = request.EntityMetaData.OriginEntityCode;
 
             metadata.EntityType = request.EntityMetaData.EntityType;
             metadata.OriginEntityCode = code;
             metadata.Name = request.EntityMetaData.Name;
 
-            if (!jobData.SkipEntityCodeCreation)
+            if (!jobData.SkipCompanyHouseNumberEntityCodeCreation)
             {
-                metadata.Codes.Add(code);
+                metadata.Codes.Add(new EntityCode(request.EntityMetaData.EntityType, GetCodeOrigin(), resultCompany.company_number));
             }
 
-            if (!jobData.SkipEntityCodeCreation && !string.IsNullOrEmpty(resultCompany.company_name))
+            if (!jobData.SkipCompanyHouseNameEntityCodeCreation && !string.IsNullOrEmpty(resultCompany.company_name))
             {
                 metadata.Codes.Add(new EntityCode(request.EntityMetaData.EntityType, GetCodeOrigin(), resultCompany.company_name));
             }
