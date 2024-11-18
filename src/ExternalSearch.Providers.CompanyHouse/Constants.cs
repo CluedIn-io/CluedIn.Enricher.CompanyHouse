@@ -26,7 +26,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
                 {
                     displayName = "Accepted Entity Type",
                     type = "input",
-                    isRequired = false,
+                    isRequired = true,
                     name = KeyName.AcceptedEntityType
                 },
                 new Control()
@@ -49,6 +49,20 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
                     type = "input",
                     isRequired = false,
                     name = KeyName.OrgNameKey
+                },
+                new()
+                {
+                    displayName = "Skip Entity Code Creation (Company House Number)",
+                    type = "checkbox",
+                    isRequired = false,
+                    name =  KeyName.SkipCompanyHouseNumberEntityCodeCreation,
+                },
+                new()
+                {
+                    displayName = "Skip Entity Code Creation (Company Name)",
+                    type = "checkbox",
+                    isRequired = false,
+                    name =  KeyName.SkipCompanyHouseNameEntityCodeCreation,
                 }
             }
         };
@@ -75,6 +89,8 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             public const string CompanyHouseNumberKey = nameof(CompanyHouseNumberKey);
             public const string CountryKey = nameof(CountryKey);
             public const string OrgNameKey = nameof(OrgNameKey);
+            public const string SkipCompanyHouseNumberEntityCodeCreation = nameof(SkipCompanyHouseNumberEntityCodeCreation);
+            public const string SkipCompanyHouseNameEntityCodeCreation = nameof(SkipCompanyHouseNameEntityCodeCreation);
         }
     }
 }
