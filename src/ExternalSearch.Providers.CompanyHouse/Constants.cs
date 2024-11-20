@@ -19,50 +19,62 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 
         public static AuthMethods AuthMethods { get; set; } = new AuthMethods()
         {
-            token = new List<Control>
+            Token = new List<Control>
             {
-                new Control() { displayName = "API Key", type = "password", isRequired = true, name = KeyName.ApiKey },
-                new Control()
-                {
-                    displayName = "Accepted Entity Type",
-                    type = "input",
-                    isRequired = true,
-                    name = KeyName.AcceptedEntityType
+                new Control() {
+                    DisplayName = "API Key",
+                    Type = "password",
+                    IsRequired = true,
+                    Name = KeyName.ApiKey,
+                    Help = "The key to authenticate access to the Companies House API"
                 },
                 new Control()
                 {
-                    displayName = "Companies House Number vocab key",
-                    type = "input",
-                    isRequired = false,
-                    name = KeyName.CompanyHouseNumberKey
+                    DisplayName = "Accepted Entity Type",
+                    Type = "input",
+                    IsRequired = true,
+                    Name = KeyName.AcceptedEntityType,
+                    Help = "The entity type that defines the golden records you want to enrich (e.g., /Organization)."
                 },
                 new Control()
                 {
-                    displayName = "Country vocab key",
-                    type = "input",
-                    isRequired = false,
-                    name = KeyName.CountryKey
+                    DisplayName = "Companies House Number Vocabulary Key",
+                    Type = "input",
+                    IsRequired = false,
+                    Name = KeyName.CompanyHouseNumberKey,
+                    Help = "The vocabulary key that contains the Company House Number of companies you want to enrich (e.g., organization.companyshousenumber)"
                 },
                 new Control()
                 {
-                    displayName = "Organization Name vocab key",
-                    type = "input",
-                    isRequired = false,
-                    name = KeyName.OrgNameKey
+                    DisplayName = "Country Vocabulary Key",
+                    Type = "input",
+                    IsRequired = false,
+                    Name = KeyName.CountryKey,
+                    Help = "The vocabulary key that contains the countries of companies you want to enrich (e.g., organization.country)."
+                },
+                new Control()
+                {
+                    DisplayName = "Organization Name Vocabulary Key",
+                    Type = "input",
+                    IsRequired = false,
+                    Name = KeyName.OrgNameKey,
+                    Help = "The vocabulary key that contains the names of companies you want to enrich (e.g., organization.name)."
                 },
                 new()
                 {
-                    displayName = "Skip Entity Code Creation (Company House Number)",
-                    type = "checkbox",
-                    isRequired = false,
-                    name =  KeyName.SkipCompanyHouseNumberEntityCodeCreation,
+                    DisplayName = "Skip Entity Code Creation (Company House Number)",
+                    Type = "checkbox",
+                    IsRequired = false,
+                    Name =  KeyName.SkipCompanyHouseNumberEntityCodeCreation,
+                    Help = "Toggle to control the creation of new entity codes using the Company House Number."
                 },
                 new()
                 {
-                    displayName = "Skip Entity Code Creation (Company Name)",
-                    type = "checkbox",
-                    isRequired = false,
-                    name =  KeyName.SkipCompanyHouseNameEntityCodeCreation,
+                    DisplayName = "Skip Entity Code Creation (Company Name)",
+                    Type = "checkbox",
+                    IsRequired = false,
+                    Name =  KeyName.SkipCompanyHouseNameEntityCodeCreation,
+                    Help = "Toggle to control the creation of new entity codes using the Company Name."
                 }
             }
         };
