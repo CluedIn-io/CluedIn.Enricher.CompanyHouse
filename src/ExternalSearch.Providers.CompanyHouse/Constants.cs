@@ -96,13 +96,13 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 
         public struct KeyName
         {
-            public const string ApiKey = nameof(ApiKey);
-            public const string AcceptedEntityType = nameof(AcceptedEntityType);
-            public const string CompanyHouseNumberKey = nameof(CompanyHouseNumberKey);
-            public const string CountryKey = nameof(CountryKey);
-            public const string OrgNameKey = nameof(OrgNameKey);
-            public const string SkipCompanyHouseNumberEntityCodeCreation = nameof(SkipCompanyHouseNumberEntityCodeCreation);
-            public const string SkipCompanyHouseNameEntityCodeCreation = nameof(SkipCompanyHouseNameEntityCodeCreation);
+            public const string ApiKey = "apiKey";
+            public const string AcceptedEntityType = "acceptedEntityType";
+            public const string CompanyHouseNumberKey = "companyHouseNumberKey";
+            public const string CountryKey = "countryKey";
+            public const string OrgNameKey = "orgNameKey";
+            public const string SkipCompanyHouseNumberEntityCodeCreation = "skipCompanyHouseNumberEntityCodeCreation";
+            public const string SkipCompanyHouseNameEntityCodeCreation = "skipCompanyHouseNameEntityCodeCreation";
         }
     }
 }
