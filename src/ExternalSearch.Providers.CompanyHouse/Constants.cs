@@ -31,7 +31,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
                 new Control()
                 {
                     DisplayName = "Accepted Entity Type",
-                    Type = "input",
+                    Type = "entityTypeSelector",
                     IsRequired = true,
                     Name = KeyName.AcceptedEntityType,
                     Help = "The entity type that defines the golden records you want to enrich (e.g., /Organization)."
@@ -39,7 +39,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
                 new Control()
                 {
                     DisplayName = "Companies House Number Vocabulary Key",
-                    Type = "input",
+                    Type = "vocabularyKeySelector",
                     IsRequired = false,
                     Name = KeyName.CompanyHouseNumberKey,
                     Help = "The vocabulary key that contains the Company House Number of companies you want to enrich (e.g., organization.companyshousenumber)"
@@ -47,7 +47,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
                 new Control()
                 {
                     DisplayName = "Country Vocabulary Key",
-                    Type = "input",
+                    Type = "vocabularyKeySelector",
                     IsRequired = false,
                     Name = KeyName.CountryKey,
                     Help = "The vocabulary key that contains the countries of companies you want to enrich (e.g., organization.country)."
@@ -55,7 +55,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
                 new Control()
                 {
                     DisplayName = "Organization Name Vocabulary Key",
-                    Type = "input",
+                    Type = "vocabularyKeySelector",
                     IsRequired = false,
                     Name = KeyName.OrgNameKey,
                     Help = "The vocabulary key that contains the names of companies you want to enrich (e.g., organization.name)."
