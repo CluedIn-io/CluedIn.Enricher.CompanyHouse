@@ -10,6 +10,39 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         public const string ComponentName = "CompanyHouse";
         public const string ProviderName = "Companies House";
         public static readonly Guid ProviderId = new Guid("{2A9E52AE-425B-4351-8AF5-6D374E8CC1A5}");
+        public const string Instruction = """
+            [
+              {
+                "type": "bulleted-list",
+                "children": [
+                  {
+                    "type": "list-item",
+                    "children": [
+                      {
+                        "text": "Add the entity type to specify the golden records you want to enrich. Only golden records belonging to that entity type will be enriched."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "list-item",
+                    "children": [
+                      {
+                        "text": "Add the vocabulary keys to provide the input for the enricher to search for additional information. For example, if you provide the website vocabulary key for the Web enricher, it will use specific websites to look for information about companies. In some cases, vocabulary keys are not required. If you don't add them, the enricher will use default vocabulary keys."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "list-item",
+                    "children": [
+                      {
+                        "text": "Add the API key to enable the enricher to retrieve information from a specific API. For example, the Vatlayer enricher requires an access key to authenticate with the Vatlayer API."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+            """;
 
         public static string About { get; set; } =
             "Companies House is an enricher which provides information on UK companies";
@@ -19,50 +52,62 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 
         public static AuthMethods AuthMethods { get; set; } = new AuthMethods()
         {
-            token = new List<Control>
+            Token = new List<Control>
             {
-                new Control() { displayName = "API Key", type = "password", isRequired = true, name = KeyName.ApiKey },
-                new Control()
-                {
-                    displayName = "Accepted Entity Type",
-                    type = "input",
-                    isRequired = true,
-                    name = KeyName.AcceptedEntityType
+                new Control() {
+                    DisplayName = "API Key",
+                    Type = "password",
+                    IsRequired = true,
+                    Name = KeyName.ApiKey,
+                    Help = "The key to authenticate access to the Companies House API"
                 },
                 new Control()
                 {
-                    displayName = "Companies House Number vocab key",
-                    type = "input",
-                    isRequired = false,
-                    name = KeyName.CompanyHouseNumberKey
+                    DisplayName = "Accepted Entity Type",
+                    Type = "entityTypeSelector",
+                    IsRequired = true,
+                    Name = KeyName.AcceptedEntityType,
+                    Help = "The entity type that defines the golden records you want to enrich (e.g., /Organization)."
                 },
                 new Control()
                 {
-                    displayName = "Country vocab key",
-                    type = "input",
-                    isRequired = false,
-                    name = KeyName.CountryKey
+                    DisplayName = "Companies House Number Vocabulary Key",
+                    Type = "vocabularyKeySelector",
+                    IsRequired = false,
+                    Name = KeyName.CompanyHouseNumberKey,
+                    Help = "The vocabulary key that contains the Company House Number of companies you want to enrich (e.g., organization.companyshousenumber)"
                 },
                 new Control()
                 {
-                    displayName = "Organization Name vocab key",
-                    type = "input",
-                    isRequired = false,
-                    name = KeyName.OrgNameKey
+                    DisplayName = "Country Vocabulary Key",
+                    Type = "vocabularyKeySelector",
+                    IsRequired = false,
+                    Name = KeyName.CountryKey,
+                    Help = "The vocabulary key that contains the countries of companies you want to enrich (e.g., organization.country)."
+                },
+                new Control()
+                {
+                    DisplayName = "Organization Name Vocabulary Key",
+                    Type = "vocabularyKeySelector",
+                    IsRequired = false,
+                    Name = KeyName.OrgNameKey,
+                    Help = "The vocabulary key that contains the names of companies you want to enrich (e.g., organization.name)."
                 },
                 new()
                 {
-                    displayName = "Skip Entity Code Creation (Company House Number)",
-                    type = "checkbox",
-                    isRequired = false,
-                    name =  KeyName.SkipCompanyHouseNumberEntityCodeCreation,
+                    DisplayName = "Skip Entity Code Creation (Company House Number)",
+                    Type = "checkbox",
+                    IsRequired = false,
+                    Name =  KeyName.SkipCompanyHouseNumberEntityCodeCreation,
+                    Help = "Toggle to control the creation of new entity codes using the Company House Number."
                 },
                 new()
                 {
-                    displayName = "Skip Entity Code Creation (Company Name)",
-                    type = "checkbox",
-                    isRequired = false,
-                    name =  KeyName.SkipCompanyHouseNameEntityCodeCreation,
+                    DisplayName = "Skip Entity Code Creation (Company Name)",
+                    Type = "checkbox",
+                    IsRequired = false,
+                    Name =  KeyName.SkipCompanyHouseNameEntityCodeCreation,
+                    Help = "Toggle to control the creation of new entity codes using the Company Name."
                 }
             }
         };
@@ -79,18 +124,21 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             //}
         };
 
-        public static Guide Guide { get; set; } = null;
+        public static Guide Guide { get; set; } = new Guide
+        {
+            Instructions = Instruction
+        };
         public static IntegrationType IntegrationType { get; set; } = IntegrationType.Enrichment;
 
         public struct KeyName
         {
-            public const string ApiKey = nameof(ApiKey);
-            public const string AcceptedEntityType = nameof(AcceptedEntityType);
-            public const string CompanyHouseNumberKey = nameof(CompanyHouseNumberKey);
-            public const string CountryKey = nameof(CountryKey);
-            public const string OrgNameKey = nameof(OrgNameKey);
-            public const string SkipCompanyHouseNumberEntityCodeCreation = nameof(SkipCompanyHouseNumberEntityCodeCreation);
-            public const string SkipCompanyHouseNameEntityCodeCreation = nameof(SkipCompanyHouseNameEntityCodeCreation);
+            public const string ApiKey = "apiKey";
+            public const string AcceptedEntityType = "acceptedEntityType";
+            public const string CompanyHouseNumberKey = "companyHouseNumberKey";
+            public const string CountryKey = "countryKey";
+            public const string OrgNameKey = "orgNameKey";
+            public const string SkipCompanyHouseNumberEntityCodeCreation = "skipCompanyHouseNumberEntityCodeCreation";
+            public const string SkipCompanyHouseNameEntityCodeCreation = "skipCompanyHouseNameEntityCodeCreation";
         }
     }
 }
