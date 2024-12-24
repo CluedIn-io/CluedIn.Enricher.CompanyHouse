@@ -54,14 +54,19 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         {
             Token = new List<Control>
             {
-                new Control() {
+                new()
+                {
                     DisplayName = "API Key",
                     Type = "password",
                     IsRequired = true,
                     Name = KeyName.ApiKey,
-                    Help = "The key to authenticate access to the Companies House API"
+                    Help = "The key to authenticate access to the Companies House API",
+                    ValidationRules =
+                    [
+                        new Dictionary<string, string> { { "regex", "\\s" }, { "message", "Spaces are not allowed" } }
+                    ],
                 },
-                new Control()
+                new()
                 {
                     DisplayName = "Accepted Entity Type",
                     Type = "entityTypeSelector",
@@ -69,7 +74,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
                     Name = KeyName.AcceptedEntityType,
                     Help = "The entity type that defines the golden records you want to enrich (e.g., /Organization)."
                 },
-                new Control()
+                new()
                 {
                     DisplayName = "Companies House Number Vocabulary Key",
                     Type = "vocabularyKeySelector",
@@ -77,7 +82,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
                     Name = KeyName.CompanyHouseNumberKey,
                     Help = "The vocabulary key that contains the Company House Number of companies you want to enrich (e.g., organization.companyshousenumber)"
                 },
-                new Control()
+                new()
                 {
                     DisplayName = "Country Vocabulary Key",
                     Type = "vocabularyKeySelector",
@@ -85,7 +90,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
                     Name = KeyName.CountryKey,
                     Help = "The vocabulary key that contains the countries of companies you want to enrich (e.g., organization.country)."
                 },
-                new Control()
+                new()
                 {
                     DisplayName = "Organization Name Vocabulary Key",
                     Type = "vocabularyKeySelector",
