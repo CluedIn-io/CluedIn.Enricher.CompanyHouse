@@ -61,10 +61,13 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
                     IsRequired = true,
                     Name = KeyName.ApiKey,
                     Help = "The key to authenticate access to the Companies House API",
-                    ValidationRules =
-                    [
-                        new Dictionary<string, string> { { "regex", "\\s" }, { "message", "Spaces are not allowed" } }
-                    ],
+                    ValidationRules = new List<Dictionary<string, string>>()
+                    {
+                        new() {
+                            { "regex", "\\s" },
+                            { "message", "Spaces are not allowed" }
+                        }
+                    },
                 },
                 new()
                 {
