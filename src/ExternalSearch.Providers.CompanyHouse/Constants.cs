@@ -103,19 +103,19 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
                 },
                 new()
                 {
-                    DisplayName = "Skip Entity Code Creation (Company House Number)",
+                    DisplayName = "Skip Identifier Creation (Company House Number)",
                     Type = "checkbox",
                     IsRequired = false,
                     Name =  KeyName.SkipCompanyHouseNumberEntityCodeCreation,
-                    Help = "Toggle to control the creation of new entity codes using the Company House Number."
+                    Help = "Toggle to control the creation of new identifiers using the Company House Number."
                 },
                 new()
                 {
-                    DisplayName = "Skip Entity Code Creation (Company Name)",
+                    DisplayName = "Skip Identifier Creation (Company Name)",
                     Type = "checkbox",
                     IsRequired = false,
                     Name =  KeyName.SkipCompanyHouseNameEntityCodeCreation,
-                    Help = "Toggle to control the creation of new entity codes using the Company Name."
+                    Help = "Toggle to control the creation of new identifiers using the Company Name."
                 }
             }
         };
