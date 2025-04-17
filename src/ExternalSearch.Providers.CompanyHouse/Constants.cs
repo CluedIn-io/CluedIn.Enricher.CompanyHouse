@@ -101,22 +101,6 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
                     Name = KeyName.OrgNameKey,
                     Help = "The vocabulary key that contains the names of companies you want to enrich (e.g., organization.name)."
                 },
-                new()
-                {
-                    DisplayName = $"Skip {Core.Constants.DomainLabels.EntityCode} Creation (Company House Number)",
-                    Type = "checkbox",
-                    IsRequired = false,
-                    Name =  KeyName.SkipCompanyHouseNumberEntityCodeCreation,
-                    Help = $"Toggle to control the creation of new {Core.Constants.DomainLabels.EntityCodes.ToLower()} using the Company House Number."
-                },
-                new()
-                {
-                    DisplayName = $"Skip {Core.Constants.DomainLabels.EntityCode} Creation (Company Name)",
-                    Type = "checkbox",
-                    IsRequired = false,
-                    Name =  KeyName.SkipCompanyHouseNameEntityCodeCreation,
-                    Help = $"Toggle to control the creation of new {Core.Constants.DomainLabels.EntityCodes.ToLower()} using the Company Name."
-                }
             }
         };
 
@@ -145,8 +129,6 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             public const string CompanyHouseNumberKey = "companyHouseNumberKey";
             public const string CountryKey = "countryKey";
             public const string OrgNameKey = "orgNameKey";
-            public const string SkipCompanyHouseNumberEntityCodeCreation = "skipCompanyHouseNumberEntityCodeCreation";
-            public const string SkipCompanyHouseNameEntityCodeCreation = "skipCompanyHouseNameEntityCodeCreation";
         }
     }
 }
