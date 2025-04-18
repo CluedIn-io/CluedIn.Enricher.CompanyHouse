@@ -108,7 +108,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             IProvider provider)
         {
             var resultItem = result.As<CompanyNew>();
-            var code = new EntityCode(request.EntityMetaData.OriginEntityCode.Type, "companiesHouse", resultItem.Data.company_number);
+            var code = new EntityCode(request.EntityMetaData.OriginEntityCode.Type, GetCodeOrigin(), resultItem.Data.company_number);
             var clue = new Clue(code, context.Organization) { Data = { OriginProviderDefinitionId = Id } };
 
             PopulateMetadata(clue.Data.EntityData, resultItem.Data, request);
@@ -346,17 +346,12 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         /// <param name="resultCompany">The result item.</param>
         private void PopulateMetadata(IEntityMetadata metadata, CompanyNew resultCompany, IExternalSearchRequest request)
         {
-            var code = new EntityCode(request.EntityMetaData.OriginEntityCode.Type, "companiesHouse", resultCompany.company_number);
+            var code = new EntityCode(request.EntityMetaData.OriginEntityCode.Type, GetCodeOrigin(), resultCompany.company_number);
 
             metadata.EntityType = request.EntityMetaData.EntityType;
             metadata.OriginEntityCode = code;
             metadata.Name = request.EntityMetaData.Name;
             metadata.Codes.Add(request.EntityMetaData.OriginEntityCode);
-
-            if (!string.IsNullOrEmpty(resultCompany.company_name))
-            {
-                metadata.Codes.Add(new EntityCode(EntityType.Organization, GetCodeOrigin(), resultCompany.company_name));
-            }
 
             metadata.DisplayName = resultCompany.company_name.PrintIfAvailable();
 
