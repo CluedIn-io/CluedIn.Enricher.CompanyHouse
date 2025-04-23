@@ -108,10 +108,10 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             IProvider provider)
         {
             var resultItem = result.As<CompanyNew>();
+            var code = new EntityCode(request.EntityMetaData.OriginEntityCode.Type, GetCodeOrigin(), resultItem.Data.company_number);
+            var clue = new Clue(code, context.Organization) { Data = { OriginProviderDefinitionId = Id } };
 
-            var clue = new Clue(request.EntityMetaData.OriginEntityCode, context.Organization) { Data = { OriginProviderDefinitionId = Id } };
-
-            PopulateMetadata(clue.Data.EntityData, resultItem.Data, request, config);
+            PopulateMetadata(clue.Data.EntityData, resultItem.Data, request);
             yield return clue;
         }
 
@@ -119,7 +119,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             IExternalSearchRequest request, IDictionary<string, object> config, IProvider provider)
         {
             var resultItem = result.As<CompanyNew>();
-            return CreateMetadata(resultItem, request, config);
+            return CreateMetadata(resultItem, request);
         }
 
         public IPreviewImage GetPrimaryEntityPreviewImage(ExecutionContext context, IExternalSearchQueryResult result,
@@ -325,11 +325,11 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             return new ConnectionVerificationResult(response.IsSuccessful, errorMessage);
         }
 
-        private IEntityMetadata CreateMetadata(IExternalSearchQueryResult<CompanyNew> resultItem, IExternalSearchRequest request, IDictionary<string, object> config)
+        private IEntityMetadata CreateMetadata(IExternalSearchQueryResult<CompanyNew> resultItem, IExternalSearchRequest request)
         {
             var metadata = new EntityMetadataPart();
 
-            PopulateMetadata(metadata, resultItem.Data, request, config);
+            PopulateMetadata(metadata, resultItem.Data, request);
 
             return metadata;
         }
@@ -344,24 +344,14 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         /// <summary>Populates the metadata.</summary>
         /// <param name="metadata">The metadata.</param>
         /// <param name="resultCompany">The result item.</param>
-        private void PopulateMetadata(IEntityMetadata metadata, CompanyNew resultCompany, IExternalSearchRequest request, IDictionary<string, object> config)
+        private void PopulateMetadata(IEntityMetadata metadata, CompanyNew resultCompany, IExternalSearchRequest request)
         {
-            var jobData = new CompanyHouseExternalSearchJobData(config);
-            var code = request.EntityMetaData.OriginEntityCode;
+            var code = new EntityCode(request.EntityMetaData.OriginEntityCode.Type, GetCodeOrigin(), resultCompany.company_number);
 
             metadata.EntityType = request.EntityMetaData.EntityType;
             metadata.OriginEntityCode = code;
             metadata.Name = request.EntityMetaData.Name;
-
-            if (!jobData.SkipCompanyHouseNumberEntityCodeCreation)
-            {
-                metadata.Codes.Add(new EntityCode(request.EntityMetaData.EntityType, GetCodeOrigin(), resultCompany.company_number));
-            }
-
-            if (!jobData.SkipCompanyHouseNameEntityCodeCreation && !string.IsNullOrEmpty(resultCompany.company_name))
-            {
-                metadata.Codes.Add(new EntityCode(request.EntityMetaData.EntityType, GetCodeOrigin(), resultCompany.company_name));
-            }
+            metadata.Codes.Add(request.EntityMetaData.OriginEntityCode);
 
             metadata.DisplayName = resultCompany.company_name.PrintIfAvailable();
 
