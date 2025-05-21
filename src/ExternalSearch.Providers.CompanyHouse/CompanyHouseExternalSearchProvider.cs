@@ -10,8 +10,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using CluedIn.Core;
+using CluedIn.Core.Connectors;
 using CluedIn.Core.Data;
 using CluedIn.Core.Data.Parts;
 using CluedIn.Core.Data.Relational;
@@ -21,7 +24,7 @@ using CluedIn.Crawling.Helpers;
 using CluedIn.ExternalSearch.Filters;
 using CluedIn.ExternalSearch.Providers.CompanyHouse.Model;
 using CluedIn.ExternalSearch.Providers.CompanyHouse.Vocabularies;
-using Neo4j.Driver;
+using RestSharp;
 using EntityType = CluedIn.Core.Data.EntityType;
 
 namespace CluedIn.ExternalSearch.Providers.CompanyHouse
@@ -29,7 +32,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
     /// <summary>The clear bit external search provider.</summary>
     /// <seealso cref="CluedIn.ExternalSearch.ExternalSearchProviderBase" />
     public class CompanyHouseExternalSearchProvider : ExternalSearchProviderBase, IExtendedEnricherMetadata,
-        IConfigurableExternalSearchProvider
+        IConfigurableExternalSearchProvider, IExternalSearchProviderWithVerifyConnection
     {
         private static readonly EntityType[] DefaultAcceptedEntityTypes = { };
 
@@ -105,10 +108,10 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             IProvider provider)
         {
             var resultItem = result.As<CompanyNew>();
+            var code = new EntityCode(request.EntityMetaData.OriginEntityCode.Type, GetCodeOrigin(), resultItem.Data.company_number);
+            var clue = new Clue(code, context.Organization) { Data = { OriginProviderDefinitionId = Id } };
 
-            var clue = new Clue(request.EntityMetaData.OriginEntityCode, context.Organization) { Data = { OriginProviderDefinitionId = Id } };
-
-            PopulateMetadata(clue.Data.EntityData, resultItem.Data, request, config);
+            PopulateMetadata(clue.Data.EntityData, resultItem.Data, request);
             yield return clue;
         }
 
@@ -116,7 +119,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             IExternalSearchRequest request, IDictionary<string, object> config, IProvider provider)
         {
             var resultItem = result.As<CompanyNew>();
-            return CreateMetadata(resultItem, request, config);
+            return CreateMetadata(resultItem, request);
         }
 
         public IPreviewImage GetPrimaryEntityPreviewImage(ExecutionContext context, IExternalSearchQueryResult result,
@@ -254,6 +257,40 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             return Convert.ToBase64String(plainTextBytes);
         }
 
+        public ConnectionVerificationResult VerifyConnection(ExecutionContext context, IReadOnlyDictionary<string, object> config)
+        {
+            IDictionary<string, object> configDict = config.ToDictionary(entry => entry.Key, entry => entry.Value);
+            var jobData = new CompanyHouseExternalSearchJobData(configDict);
+
+            var client = new RestClient("https://api.companieshouse.gov.uk");
+            var request = new RestRequest { Method = Method.GET };
+
+            request.AddHeader("Authorization", "Basic " + Base64Encode(jobData.ApiKey));
+            request.Resource = $"search/companies?q=Google";
+            var companiesResponse = client.ExecuteAsync<CompanySearchResponse>(request).Result;
+
+            if (!companiesResponse.IsSuccessful)
+            {
+                return ConstructVerifyConnectionResponse(companiesResponse);
+            }
+
+            if (companiesResponse.StatusCode == HttpStatusCode.OK)
+            {
+                foreach (var companyResult in companiesResponse.Data.items)
+                {
+                    request.Resource = $"company/{companyResult.company_number}";
+                    var companyResponse = client.ExecuteAsync<CompanyNew>(request).Result;
+
+                    if (!companyResponse.IsSuccessful)
+                    {
+                        return ConstructVerifyConnectionResponse(companyResponse);
+                    }
+                }
+            }
+
+            return new ConnectionVerificationResult(true, string.Empty);
+        }
+
         public override bool Accepts(EntityType entityType) => throw new NotSupportedException();
 
         public override IEnumerable<IExternalSearchQueryResult> ExecuteSearch(ExecutionContext context, IExternalSearchQuery query) => throw new NotSupportedException();
@@ -264,11 +301,35 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 
         public override IPreviewImage GetPrimaryEntityPreviewImage(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request) => throw new NotSupportedException();
 
-        private IEntityMetadata CreateMetadata(IExternalSearchQueryResult<CompanyNew> resultItem, IExternalSearchRequest request, IDictionary<string, object> config)
+        private ConnectionVerificationResult ConstructVerifyConnectionResponse(IRestResponse response)
+        {
+            var errorMessageBase = $"{Constants.ProviderName} returned \"{(int)response.StatusCode} {response.StatusDescription}\".";
+            if (response.ErrorException != null)
+            {
+                return new ConnectionVerificationResult(false, $"{errorMessageBase} {(!string.IsNullOrWhiteSpace(response.ErrorException.Message) ? response.ErrorException.Message : "This could be due to breaking changes in the external system")}.");
+            }
+
+            if (response.StatusCode is HttpStatusCode.Unauthorized)
+            {
+                return new ConnectionVerificationResult(false, $"{errorMessageBase} This could be due to invalid API key.");
+            }
+
+            var regex = new Regex(@"\<(html|head|body|div|span|img|p\>|a href)", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace);
+            var isHtml = regex.IsMatch(response.Content);
+
+            var errorMessage = response.IsSuccessful ? string.Empty
+                : string.IsNullOrWhiteSpace(response.Content) || isHtml
+                    ? $"{errorMessageBase} This could be due to breaking changes in the external system."
+                    : $"{errorMessageBase} {response.Content}.";
+
+            return new ConnectionVerificationResult(response.IsSuccessful, errorMessage);
+        }
+
+        private IEntityMetadata CreateMetadata(IExternalSearchQueryResult<CompanyNew> resultItem, IExternalSearchRequest request)
         {
             var metadata = new EntityMetadataPart();
 
-            PopulateMetadata(metadata, resultItem.Data, request, config);
+            PopulateMetadata(metadata, resultItem.Data, request);
 
             return metadata;
         }
@@ -283,24 +344,14 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         /// <summary>Populates the metadata.</summary>
         /// <param name="metadata">The metadata.</param>
         /// <param name="resultCompany">The result item.</param>
-        private void PopulateMetadata(IEntityMetadata metadata, CompanyNew resultCompany, IExternalSearchRequest request, IDictionary<string, object> config)
+        private void PopulateMetadata(IEntityMetadata metadata, CompanyNew resultCompany, IExternalSearchRequest request)
         {
-            var jobData = new CompanyHouseExternalSearchJobData(config);
-            var code = request.EntityMetaData.OriginEntityCode;
+            var code = new EntityCode(request.EntityMetaData.OriginEntityCode.Type, GetCodeOrigin(), resultCompany.company_number);
 
             metadata.EntityType = request.EntityMetaData.EntityType;
             metadata.OriginEntityCode = code;
             metadata.Name = request.EntityMetaData.Name;
-
-            if (!jobData.SkipCompanyHouseNumberEntityCodeCreation)
-            {
-                metadata.Codes.Add(new EntityCode(request.EntityMetaData.EntityType, GetCodeOrigin(), resultCompany.company_number));
-            }
-
-            if (!jobData.SkipCompanyHouseNameEntityCodeCreation && !string.IsNullOrEmpty(resultCompany.company_name))
-            {
-                metadata.Codes.Add(new EntityCode(request.EntityMetaData.EntityType, GetCodeOrigin(), resultCompany.company_name));
-            }
+            metadata.Codes.Add(request.EntityMetaData.OriginEntityCode);
 
             metadata.DisplayName = resultCompany.company_name.PrintIfAvailable();
 
