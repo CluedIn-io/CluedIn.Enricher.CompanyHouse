@@ -10,7 +10,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         public const string ComponentName = "CompanyHouse";
         public const string ProviderName = "Companies House";
         public static readonly Guid ProviderId = new Guid("{2A9E52AE-425B-4351-8AF5-6D374E8CC1A5}");
-        public const string Instruction = """
+        public static readonly string Instruction = $$"""
             [
               {
                 "type": "bulleted-list",
@@ -19,7 +19,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
                     "type": "list-item",
                     "children": [
                       {
-                        "text": "Add the business domain to specify the golden records you want to enrich. Only golden records belonging to that business domain will be enriched."
+                        "text": "Add the {{Core.Constants.DomainLabels.EntityType.ToLower()}} to specify the golden records you want to enrich. Only golden records belonging to that {{Core.Constants.DomainLabels.EntityType.ToLower()}} will be enriched."
                       }
                     ]
                   },
@@ -71,11 +71,11 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
                 },
                 new()
                 {
-                    DisplayName = "Accepted Business Domain",
+                    DisplayName = $"Accepted {Core.Constants.DomainLabels.EntityType}",
                     Type = "entityTypeSelector",
                     IsRequired = true,
                     Name = KeyName.AcceptedEntityType,
-                    Help = "The business domain that defines the golden records you want to enrich (e.g., /Organization)."
+                    Help = $"The {Core.Constants.DomainLabels.EntityType.ToLower()} that defines the golden records you want to enrich (e.g., /Organization)."
                 },
                 new()
                 {
@@ -101,22 +101,6 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
                     Name = KeyName.OrgNameKey,
                     Help = "The vocabulary key that contains the names of companies you want to enrich (e.g., organization.name)."
                 },
-                new()
-                {
-                    DisplayName = "Skip Identifier Creation (Company House Number)",
-                    Type = "checkbox",
-                    IsRequired = false,
-                    Name =  KeyName.SkipCompanyHouseNumberEntityCodeCreation,
-                    Help = "Toggle to control the creation of new identifiers using the Company House Number."
-                },
-                new()
-                {
-                    DisplayName = "Skip Identifier Creation (Company Name)",
-                    Type = "checkbox",
-                    IsRequired = false,
-                    Name =  KeyName.SkipCompanyHouseNameEntityCodeCreation,
-                    Help = "Toggle to control the creation of new identifiers using the Company Name."
-                }
             }
         };
 
@@ -145,8 +129,6 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             public const string CompanyHouseNumberKey = "companyHouseNumberKey";
             public const string CountryKey = "countryKey";
             public const string OrgNameKey = "orgNameKey";
-            public const string SkipCompanyHouseNumberEntityCodeCreation = "skipCompanyHouseNumberEntityCodeCreation";
-            public const string SkipCompanyHouseNameEntityCodeCreation = "skipCompanyHouseNameEntityCodeCreation";
         }
     }
 }
