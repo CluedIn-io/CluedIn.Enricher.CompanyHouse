@@ -84,23 +84,37 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
                 ? query.QueryParameters[ExternalSearchQueryParameter.Name].FirstOrDefault()
                 : null;
 
-            if (string.IsNullOrEmpty(name))
-            {
-                yield break;
-            }
+            var companyNumber = query.QueryParameters.ContainsKey(ExternalSearchQueryParameter.Identifier)
+                ? query.QueryParameters[ExternalSearchQueryParameter.Identifier].FirstOrDefault()
+                : null;
 
             var client = new CompanyHouseClient(jobData);
-            var companies = client.GetCompanies(name);
-            if (companies == null)
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                var companies = client.GetCompanies(name);
+                if (companies != null)
+                {
+                    foreach (var company in companies.Select(companyResult => client.GetCompany(companyResult.company_number)))
+                    {
+                        yield return new ExternalSearchQueryResult<CompanyNew>(query, company);
+                    }
+                }
+            }
+
+            if (string.IsNullOrEmpty(companyNumber))
             {
                 yield break;
             }
 
-            foreach (var companyResult in companies)
+            var companySearchByNumber = client.GetCompany(companyNumber);
+
+            if (companySearchByNumber == null)
             {
-                var company = client.GetCompany(companyResult.company_number);
-                yield return new ExternalSearchQueryResult<CompanyNew>(query, company);
+                throw new Exception($"Unable to retrieve company profile for Company House Number: {companyNumber}. Please verify if the number is valid.");
             }
+
+            yield return new ExternalSearchQueryResult<CompanyNew>(query, companySearchByNumber);
         }
 
         public IEnumerable<Clue> BuildClues(ExecutionContext context, IExternalSearchQuery query,
@@ -172,10 +186,10 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             var existingResults = request.GetQueryResults<CompanyNew>(this).ToList();
 
             bool idFilter(string value) =>
-                existingResults.Any(r => string.Equals(r.Data.company_number, value, StringComparison.InvariantCultureIgnoreCase));
+                existingResults.Any(r => r?.Data?.company_number != null && string.Equals(r.Data.company_number, value, StringComparison.InvariantCultureIgnoreCase));
 
             bool nameFilter(string value) =>
-                existingResults.Any(r => string.Equals(r.Data.company_name, value, StringComparison.InvariantCultureIgnoreCase));
+                existingResults.Any(r => r?.Data?.company_name != null && string.Equals(r.Data.company_name, value, StringComparison.InvariantCultureIgnoreCase));
 
             var entityType = request.EntityMetaData.EntityType;
 
