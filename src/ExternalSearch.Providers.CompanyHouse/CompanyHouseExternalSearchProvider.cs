@@ -111,7 +111,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 
             if (companySearchByNumber == null)
             {
-                throw new Exception($"Unable to retrieve company profile for Company House Number: {companyNumber}. Please verify if the number is valid.");
+                yield break;
             }
 
             yield return new ExternalSearchQueryResult<CompanyNew>(query, companySearchByNumber);
@@ -185,13 +185,14 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 
             var existingResults = request.GetQueryResults<CompanyNew>(this).ToList();
 
-            bool idFilter(string value) =>
+            bool existingCompanyHouseNumberDataFilter(string value) =>
                 existingResults.Any(r => r?.Data?.company_number != null && string.Equals(r.Data.company_number, value, StringComparison.InvariantCultureIgnoreCase));
 
-            bool nameFilter(string value) =>
+            bool existingNameDataFilter(string value) =>
                 existingResults.Any(r => r?.Data?.company_name != null && string.Equals(r.Data.company_name, value, StringComparison.InvariantCultureIgnoreCase));
 
             var entityType = request.EntityMetaData.EntityType;
+            var entityName = !string.IsNullOrEmpty(request.EntityMetaData.Name) ? request.EntityMetaData.Name : request.EntityMetaData.DisplayName;
 
             HashSet<string> companyHouseNumber;
 
@@ -247,22 +248,23 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
                 organizationName.Add(request.EntityMetaData.DisplayName);
             }
 
-            if (organizationName != null)
-            {
-                var values = organizationName.Select(NameNormalization.Normalize).ToHashSet();
+            var queriesGenerated = false;
+            var normalizeOrganizationName = organizationName.Select(NameNormalization.Normalize).ToHashSet();
 
-                foreach (var value in values.Where(v => !nameFilter(v)))
-                {
-                    yield return new ExternalSearchQuery(this, entityType, ExternalSearchQueryParameter.Name, value);
-                }
+            foreach (var value in normalizeOrganizationName.Where(v => !existingNameDataFilter(v)))
+            {
+                queriesGenerated = true;
+                yield return new ExternalSearchQuery(this, entityType, ExternalSearchQueryParameter.Name, value);
             }
 
-            foreach (var value in companyHouseNumber.Where(v => !idFilter(v)))
+            foreach (var value in companyHouseNumber.Where(v => !existingCompanyHouseNumberDataFilter(v)))
             {
-                var externalSearchQuery =
-                    new ExternalSearchQuery(this, entityType, ExternalSearchQueryParameter.Identifier, value);
-                yield return externalSearchQuery;
+                queriesGenerated = true;
+                yield return new ExternalSearchQuery(this, entityType, ExternalSearchQueryParameter.Identifier, value);
             }
+
+            // Throw error when queries not generated
+            ThrowExceptions(queriesGenerated, companyHouseNumber, normalizeOrganizationName, entityName, jobData);
         }
 
         public static string Base64Encode(string plainText)
@@ -454,6 +456,19 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             metadata.Properties[vocab.Locality] = address.locality.PrintIfAvailable();
             metadata.Properties[vocab.AddressLine1] = address.address_line_1.PrintIfAvailable();
             metadata.Properties[vocab.AddressLine2] = address.address_line_2.PrintIfAvailable();
+        }
+
+        private static void ThrowExceptions(bool queriesGenerated, HashSet<string> companyHouseNumber, HashSet<string> normalizeOrganizationName, string entityName, CompanyHouseExternalSearchJobData jobData)
+        {
+            switch (queriesGenerated)
+            {
+                case false when !string.IsNullOrWhiteSpace(jobData.CompanyHouseNumberKey) && string.IsNullOrWhiteSpace(jobData.OrgNameKey) && !companyHouseNumber.Any():
+                    throw new Exception($"Unable to generate queries for {entityName}. Company House number is empty.");
+                case false when !string.IsNullOrWhiteSpace(jobData.OrgNameKey) && string.IsNullOrWhiteSpace(jobData.CompanyHouseNumberKey) && !normalizeOrganizationName.Any():
+                    throw new Exception($"Unable to generate queries for {entityName}. Name is empty.");
+                case false when !companyHouseNumber.Any() && !normalizeOrganizationName.Any():
+                    throw new Exception($"Unable to generate queries for {entityName}. Both Company House number and name are empty.");
+            }
         }
     }
 }
