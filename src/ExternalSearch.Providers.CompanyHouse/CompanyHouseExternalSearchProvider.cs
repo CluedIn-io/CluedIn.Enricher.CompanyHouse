@@ -238,14 +238,17 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
                     Core.Data.Vocabularies.Vocabularies.CluedInOrganization.OrganizationName, new HashSet<string>());
             }
 
-            if (!string.IsNullOrEmpty(request.EntityMetaData.Name))
+            if (jobData.SearchWithEntityName)
             {
-                organizationName.Add(request.EntityMetaData.Name);
-            }
+                if (!string.IsNullOrEmpty(request.EntityMetaData.Name))
+                {
+                    organizationName.Add(request.EntityMetaData.Name);
+                }
 
-            if (!string.IsNullOrEmpty(request.EntityMetaData.DisplayName))
-            {
-                organizationName.Add(request.EntityMetaData.DisplayName);
+                if (!string.IsNullOrEmpty(request.EntityMetaData.DisplayName))
+                {
+                    organizationName.Add(request.EntityMetaData.DisplayName);
+                }
             }
 
             var queriesGenerated = false;
