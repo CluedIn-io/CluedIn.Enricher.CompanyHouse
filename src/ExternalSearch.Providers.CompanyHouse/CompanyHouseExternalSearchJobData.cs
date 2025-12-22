@@ -12,6 +12,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             CompanyHouseNumberKey = GetValue<string>(configuration, Constants.KeyName.CompanyHouseNumberKey);
             CountryKey = GetValue<string>(configuration, Constants.KeyName.CountryKey);
             OrgNameKey = GetValue<string>(configuration, Constants.KeyName.OrgNameKey);
+            SearchWithEntityName = GetValue<bool>(configuration, Constants.KeyName.SearchWithEntityName);
         }
 
         public string ApiKey { get; set; }
@@ -19,6 +20,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         public string CompanyHouseNumberKey { get; set; }
         public string CountryKey { get; set; }
         public string OrgNameKey { get; set; }
+        public bool SearchWithEntityName { get; set; }
 
         public IDictionary<string, object> ToDictionary()
         {
@@ -29,6 +31,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
                 { Constants.KeyName.CompanyHouseNumberKey, CompanyHouseNumberKey },
                 { Constants.KeyName.CountryKey, CountryKey },
                 { Constants.KeyName.OrgNameKey, OrgNameKey },
+                { Constants.KeyName.SearchWithEntityName, SearchWithEntityName },
             };
         }
     }
