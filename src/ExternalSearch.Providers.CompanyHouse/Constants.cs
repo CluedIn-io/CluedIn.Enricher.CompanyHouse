@@ -101,6 +101,14 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
                     Name = KeyName.OrgNameKey,
                     Help = "The vocabulary key that contains the names of companies you want to enrich (e.g., organization.name)."
                 },
+                new()
+                {
+                    DisplayName = "Search using Golden Record Name",
+                    Type = "checkbox",
+                    IsRequired = false,
+                    Name = KeyName.SearchWithEntityName,
+                    Help = "Toggle to control whether the golden record name is used for searching when the organization name vocabulary key is empty or not provided"
+                },
             }
         };
 
@@ -129,6 +137,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             public const string CompanyHouseNumberKey = "companyHouseNumberKey";
             public const string CountryKey = "countryKey";
             public const string OrgNameKey = "orgNameKey";
+            public const string SearchWithEntityName = "searchWithEntityName";
         }
     }
 }
