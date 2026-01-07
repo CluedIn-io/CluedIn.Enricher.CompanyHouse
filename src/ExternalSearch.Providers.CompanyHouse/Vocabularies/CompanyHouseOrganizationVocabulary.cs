@@ -12,7 +12,7 @@ using CluedIn.Core.Data.Vocabularies;
 
 namespace CluedIn.ExternalSearch.Providers.CompanyHouse.Vocabularies;
 
-/// <summary>The clear bit organization vocabulary.</summary>
+/// <summary>The company house organization vocabulary.</summary>
 /// <seealso cref="CluedIn.Core.Data.Vocabularies.SimpleVocabulary" />
 public class CompanyHouseOrganizationVocabulary : SimpleVocabulary
 {

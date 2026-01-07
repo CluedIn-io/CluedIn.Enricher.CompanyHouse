@@ -53,7 +53,7 @@ public class CompanyHouseOrgAddressVocabulary : SimpleVocabulary
     public VocabularyKey RegisteredOfficeLocality { get; set; }
     public VocabularyKey RegisteredOfficePoBox { get; set; }
     public VocabularyKey RegisteredOfficePostalCode { get; set; }
-    public VocabularyKey RegisteredOfficePremises{ get; set; }
+    public VocabularyKey RegisteredOfficePremises { get; set; }
     public VocabularyKey RegisteredOfficeRegion { get; set; }
     public VocabularyKey ServiceAddressLine1 { get; set; }
     public VocabularyKey ServiceAddressLine2 { get; set; }

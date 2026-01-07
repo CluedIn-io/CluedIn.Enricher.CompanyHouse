@@ -382,10 +382,8 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             metadata.Properties[CompanyHouseVocabulary.Organization.Jurisdiction] = resultCompany.jurisdiction.PrintIfAvailable();
             metadata.Properties[CompanyHouseVocabulary.Organization.HasBeenLiquidated] = resultCompany.has_been_liquidated.PrintIfAvailable();
             metadata.Properties[CompanyHouseVocabulary.Organization.HasInsolvencyHistory] = resultCompany.has_insolvency_history.PrintIfAvailable();
-            metadata.Properties[CompanyHouseVocabulary.Organization.RegisteredOfficeIsInDispute] = resultCompany.registered_office_is_in_dispute.PrintIfAvailable();
             metadata.Properties[CompanyHouseVocabulary.Organization.LastFullMembersListDate] = resultCompany.last_full_members_list_date.PrintIfAvailable();
             metadata.Properties[CompanyHouseVocabulary.Organization.PartialDataAvailable] = resultCompany.partial_data_available.PrintIfAvailable();
-            metadata.Properties[CompanyHouseVocabulary.Organization.RegisteredOfficeIsInDispute] = resultCompany.registered_office_is_in_dispute.PrintIfAvailable();
             metadata.Properties[CompanyHouseVocabulary.Organization.SubType] = resultCompany.subtype.PrintIfAvailable();
             metadata.Properties[CompanyHouseVocabulary.Organization.SuperSecureManagingOfficerCount] = resultCompany.super_secure_managing_officer_count.PrintIfAvailable();
             metadata.Properties[CompanyHouseVocabulary.Organization.RegisteredOfficeIsInDispute] = resultCompany.registered_office_is_in_dispute.PrintIfAvailable();
@@ -398,8 +396,6 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 
             metadata.Properties[CompanyHouseVocabulary.Organization.CanFile] = resultCompany.can_file.PrintIfAvailable();
             metadata.Properties[CompanyHouseVocabulary.Organization.CompanyName] = resultCompany.company_name.PrintIfAvailable();
-            metadata.Properties[CompanyHouseVocabulary.Organization.CompanyNumber] = resultCompany.company_number.PrintIfAvailable();
-            metadata.Properties[CompanyHouseVocabulary.Organization.CompanyStatus] = resultCompany.company_status.PrintIfAvailable();
             metadata.Properties[CompanyHouseVocabulary.Organization.CompanyStatusDetail] = resultCompany.company_status_detail.PrintIfAvailable();
             metadata.Properties[CompanyHouseVocabulary.Organization.ConfirmationStatementLastMadeUpTo] = resultCompany.confirmation_statement?.last_made_up_to.PrintIfAvailable();
             metadata.Properties[CompanyHouseVocabulary.Organization.ConfirmationStatementNextDue] = resultCompany.confirmation_statement?.next_due.PrintIfAvailable();
@@ -494,14 +490,14 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 
         private static void PopulateCorporateAnnotation(IEntityMetadata metadata, CompanyNew resultCompany)
         {
-            var corporationAnnotationIndex = 1;
-            foreach (var corporationAnnotation in resultCompany.corporate_annotation ?? Enumerable.Empty<CorporateAnnotation>())
+            var corporateAnnotationIndex = 1;
+            foreach (var corporateAnnotation in resultCompany.corporate_annotation ?? Enumerable.Empty<CorporateAnnotation>())
             {
-                metadata.Properties[$"{CompanyHouseVocabulary.Organization.CorporateAnnotation.KeyPrefix}{CompanyHouseVocabulary.Organization.CorporateAnnotation.KeySeparator}{corporationAnnotationIndex}.createdOn"] = corporationAnnotation.created_on.PrintIfAvailable();
-                metadata.Properties[$"{CompanyHouseVocabulary.Organization.CorporateAnnotation.KeyPrefix}{CompanyHouseVocabulary.Organization.CorporateAnnotation.KeySeparator}{corporationAnnotationIndex}.description"] = corporationAnnotation.description.PrintIfAvailable();
-                metadata.Properties[$"{CompanyHouseVocabulary.Organization.CorporateAnnotation.KeyPrefix}{CompanyHouseVocabulary.Organization.CorporateAnnotation.KeySeparator}{corporationAnnotationIndex}.type"] = corporationAnnotation.type.PrintIfAvailable();
+                metadata.Properties[$"{CompanyHouseVocabulary.Organization.CorporateAnnotation.KeyPrefix}{CompanyHouseVocabulary.Organization.CorporateAnnotation.KeySeparator}{corporateAnnotationIndex}.createdOn"] = corporateAnnotation.created_on.PrintIfAvailable();
+                metadata.Properties[$"{CompanyHouseVocabulary.Organization.CorporateAnnotation.KeyPrefix}{CompanyHouseVocabulary.Organization.CorporateAnnotation.KeySeparator}{corporateAnnotationIndex}.description"] = corporateAnnotation.description.PrintIfAvailable();
+                metadata.Properties[$"{CompanyHouseVocabulary.Organization.CorporateAnnotation.KeyPrefix}{CompanyHouseVocabulary.Organization.CorporateAnnotation.KeySeparator}{corporateAnnotationIndex}.type"] = corporateAnnotation.type.PrintIfAvailable();
 
-                corporationAnnotationIndex++;
+                corporateAnnotationIndex++;
             }
         }
 
