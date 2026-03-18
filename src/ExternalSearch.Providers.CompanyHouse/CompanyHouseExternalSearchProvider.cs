@@ -374,48 +374,145 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 
             metadata.DisplayName = resultCompany.company_name.PrintIfAvailable();
 
-            metadata.Properties[CompanyHouseVocabulary.Organization.CompanyNumber] =
-                resultCompany.company_number.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.CompanyNumber] = resultCompany.company_number.PrintIfAvailable();
             metadata.Properties[CompanyHouseVocabulary.Organization.Charges] = resultCompany.has_charges.PrintIfAvailable();
-            metadata.Properties[CompanyHouseVocabulary.Organization.CompanyStatus] =
-                resultCompany.company_status.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.CompanyStatus] = resultCompany.company_status.PrintIfAvailable();
             metadata.Properties[CompanyHouseVocabulary.Organization.Type] = resultCompany.type.PrintIfAvailable();
-            metadata.Properties[CompanyHouseVocabulary.Organization.Jurisdiction] =
-                resultCompany.jurisdiction.PrintIfAvailable();
-            metadata.Properties[CompanyHouseVocabulary.Organization.Has_been_liquidated] =
-                resultCompany.has_been_liquidated.PrintIfAvailable();
-            metadata.Properties[CompanyHouseVocabulary.Organization.Has_insolvency_history] =
-                resultCompany.has_insolvency_history.PrintIfAvailable();
-            metadata.Properties[CompanyHouseVocabulary.Organization.Registered_office_is_in_dispute] =
-                resultCompany.registered_office_is_in_dispute.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.IsCommunityInterestCompany] = resultCompany.is_community_interest_company.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Jurisdiction] = resultCompany.jurisdiction.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.HasBeenLiquidated] = resultCompany.has_been_liquidated.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.HasInsolvencyHistory] = resultCompany.has_insolvency_history.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.LastFullMembersListDate] = resultCompany.last_full_members_list_date.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.PartialDataAvailable] = resultCompany.partial_data_available.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.SubType] = resultCompany.subtype.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.SuperSecureManagingOfficerCount] = resultCompany.super_secure_managing_officer_count.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.RegisteredOfficeIsInDispute] = resultCompany.registered_office_is_in_dispute.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.UndeliverableRegisteredOfficeAddress] = resultCompany.undeliverable_registered_office_address.PrintIfAvailable();
 
-            if (!string.IsNullOrEmpty(resultCompany.date_of_creation))
+            metadata.Properties[CompanyHouseVocabulary.Organization.AnnualReturnLastMadeUpTo] = resultCompany.annual_return?.last_made_up_to.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.AnnualReturnNextDue] = resultCompany.annual_return?.next_due.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.AnnualReturnNextMadeUpTo] = resultCompany.annual_return?.next_made_up_to.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.AnnualReturnOverdue] = resultCompany.annual_return?.overdue.PrintIfAvailable();
+
+            metadata.Properties[CompanyHouseVocabulary.Organization.CanFile] = resultCompany.can_file.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.CompanyName] = resultCompany.company_name.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.CompanyStatusDetail] = resultCompany.company_status_detail.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.ConfirmationStatementLastMadeUpTo] = resultCompany.confirmation_statement?.last_made_up_to.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.ConfirmationStatementNextDue] = resultCompany.confirmation_statement?.next_due.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.ConfirmationStatementNextMadeUpTo] = resultCompany.confirmation_statement?.next_made_up_to.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.ConfirmationStatementOverdue] = resultCompany.confirmation_statement?.overdue.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.BranchCompanyBusinessActivity] = resultCompany.branch_company_details?.business_activity.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.BranchCompanyParentCompanyName] = resultCompany.branch_company_details?.parent_company_name.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.BranchCompanyParentCompanyNumber] = resultCompany.branch_company_details?.parent_company_number.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.DateOfCessation] = resultCompany.date_of_cessation.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.DateOfCreation] = resultCompany.date_of_creation.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.ETag] = resultCompany.etag.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.ExternalRegistrationNumber] = resultCompany.external_registration_number.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.ForeignCompanyAccountingRequirementForeignAccountType] = resultCompany.foreign_company_details?.accounting_requirement?.foreign_account_type.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.ForeignCompanyAccountingRequirementTermsOfAccountPublication] = resultCompany.foreign_company_details?.accounting_requirement?.terms_of_account_publication.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.ForeignCompanyAccountsAccountPeriodFromDay] = resultCompany.foreign_company_details?.accounts?.account_period_from?.day.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.ForeignCompanyAccountsAccountPeriodFromMonth] = resultCompany.foreign_company_details?.accounts?.account_period_from?.month.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.ForeignCompanyAccountsAccountPeriodToDay] = resultCompany.foreign_company_details?.accounts?.account_period_to?.day.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.ForeignCompanyAccountsAccountPeriodToMonth] = resultCompany.foreign_company_details?.accounts?.account_period_to?.month.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.ForeignCompanyAccountsMustFileWithinMonths] = resultCompany.foreign_company_details?.accounts?.must_file_within?.months.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.ForeignCompanyBusinessActivity] = resultCompany.foreign_company_details?.business_activity.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.ForeignCompanyCompanyType] = resultCompany.foreign_company_details?.company_type.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.ForeignCompanyGovernedBy] = resultCompany.foreign_company_details?.governed_by.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.ForeignCompanyIsACreditFinanceInstitution] = resultCompany.foreign_company_details?.is_a_credit_finance_institution.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.ForeignCompanyOriginatingRegistryCountry] = resultCompany.foreign_company_details?.originating_registry?.country.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.ForeignCompanyOriginatingRegistryName] = resultCompany.foreign_company_details?.originating_registry?.name.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.ForeignCompanyRegistrationNumber] = resultCompany.foreign_company_details?.registration_number.PrintIfAvailable();
+
+            if (resultCompany.sic_codes != null && resultCompany.sic_codes.Any())
             {
-                //if (DateTimeOffset.TryParse(resultCompany.date_of_creation, out var createdDate))
-                //{
-                //    metadata.CreatedDate = createdDate;
-                //}
-
-                metadata.Properties[CompanyHouseVocabulary.Organization.DateOfCreation] = resultCompany.date_of_creation;
+                metadata.Properties[CompanyHouseVocabulary.Organization.SicCodes] = string.Join(", ", resultCompany.sic_codes);
             }
 
             if (resultCompany.registered_office_address != null)
             {
-                PopulateOrgAddressMetadata(metadata, CompanyHouseVocabulary.Organization.Address, resultCompany);
+                PopulateOrgAddressMetadata(metadata, resultCompany);
+            }
+
+            if (resultCompany.accounts != null)
+            {
+                PopulateOrgAccountsMetadata(metadata, resultCompany);
+            }
+
+            if (resultCompany.corporate_annotation != null && resultCompany.corporate_annotation.Any())
+            {
+                PopulateCorporateAnnotation(metadata, resultCompany);
+            }
+
+            if (resultCompany.previous_company_names != null && resultCompany.previous_company_names.Any())
+            {
+                PopulatePreviousCompanyNames(metadata, resultCompany);
             }
         }
 
-        private void PopulateOrgAddressMetadata(IEntityMetadata metadata, CompanyHouseOrgAddressVocabulary vocab,
-            CompanyNew resultCompany)
+        private void PopulateOrgAddressMetadata(IEntityMetadata metadata, CompanyNew resultCompany)
         {
-            metadata.Properties[vocab.AddressLine1] =
-                resultCompany.registered_office_address.address_line_1.PrintIfAvailable();
-            metadata.Properties[vocab.AddressLine2] =
-                resultCompany.registered_office_address.address_line_2.PrintIfAvailable();
-            metadata.Properties[vocab.Locality] = resultCompany.registered_office_address.locality.PrintIfAvailable();
-            metadata.Properties[vocab.PostCode] = resultCompany.registered_office_address.postal_code.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Address.RegisteredOfficeAddressLine1] = resultCompany.registered_office_address?.address_line_1.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Address.RegisteredOfficeAddressLine2] = resultCompany.registered_office_address?.address_line_2.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Address.RegisteredOfficeCareOf] = resultCompany.registered_office_address?.care_of.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Address.RegisteredOfficeCountry] = resultCompany.registered_office_address?.country.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Address.RegisteredOfficeLocality] = resultCompany.registered_office_address?.locality.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Address.RegisteredOfficePoBox] = resultCompany.registered_office_address?.po_box.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Address.RegisteredOfficePostalCode] = resultCompany.registered_office_address?.postal_code.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Address.RegisteredOfficePremises] = resultCompany.registered_office_address?.premises.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Address.RegisteredOfficeRegion] = resultCompany.registered_office_address?.region.PrintIfAvailable();
+
+            metadata.Properties[CompanyHouseVocabulary.Organization.Address.ServiceAddressLine1] = resultCompany.service_address?.address_line_1.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Address.ServiceAddressLine2] = resultCompany.service_address?.address_line_2.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Address.ServiceAddressCareOf] = resultCompany.service_address?.care_of.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Address.ServiceAddressCountry] = resultCompany.service_address?.country.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Address.ServiceAddressLocality] = resultCompany.service_address?.locality.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Address.ServiceAddressPoBox] = resultCompany.service_address?.po_box.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Address.ServiceAddressPostalCode] = resultCompany.service_address?.postal_code.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Address.ServiceAddressRegion] = resultCompany.service_address?.region.PrintIfAvailable();
         }
 
+        private void PopulateOrgAccountsMetadata(IEntityMetadata metadata, CompanyNew resultCompany)
+        {
+            metadata.Properties[CompanyHouseVocabulary.Organization.Accounts.AccountingReferenceDateDay] = resultCompany.accounts?.accounting_reference_date?.day.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Accounts.AccountingReferenceDateMonth] = resultCompany.accounts?.accounting_reference_date?.month.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Accounts.LastAccountsMadeUpTo] = resultCompany.accounts?.last_accounts?.made_up_to.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Accounts.LastAccountsPeriodEndOn] = resultCompany.accounts?.last_accounts?.period_end_on.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Accounts.LastAccountsPeriodStartOn] = resultCompany.accounts?.last_accounts?.period_start_on.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Accounts.LastAccountsType] = resultCompany.accounts?.last_accounts?.type.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Accounts.NextAccountsDueOn] = resultCompany.accounts?.next_accounts?.due_on.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Accounts.NextAccountsOverdue] = resultCompany.accounts?.next_accounts?.overdue.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Accounts.NextAccountsPeriodEndOn] = resultCompany.accounts?.next_accounts?.period_end_on.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Accounts.NextAccountsPeriodStartOn] = resultCompany.accounts?.next_accounts?.period_start_on.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Accounts.NextDue] = resultCompany.accounts?.next_due.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Accounts.NextMadeUpTo] = resultCompany.accounts?.next_made_up_to.PrintIfAvailable();
+            metadata.Properties[CompanyHouseVocabulary.Organization.Accounts.Overdue] = resultCompany.accounts?.overdue.PrintIfAvailable();
+        }
+
+        private static void PopulateCorporateAnnotation(IEntityMetadata metadata, CompanyNew resultCompany)
+        {
+            var corporateAnnotationIndex = 1;
+            foreach (var corporateAnnotation in resultCompany.corporate_annotation ?? Enumerable.Empty<CorporateAnnotation>())
+            {
+                metadata.Properties[$"{CompanyHouseVocabulary.Organization.CorporateAnnotation.KeyPrefix}{CompanyHouseVocabulary.Organization.CorporateAnnotation.KeySeparator}{corporateAnnotationIndex}.createdOn"] = corporateAnnotation.created_on.PrintIfAvailable();
+                metadata.Properties[$"{CompanyHouseVocabulary.Organization.CorporateAnnotation.KeyPrefix}{CompanyHouseVocabulary.Organization.CorporateAnnotation.KeySeparator}{corporateAnnotationIndex}.description"] = corporateAnnotation.description.PrintIfAvailable();
+                metadata.Properties[$"{CompanyHouseVocabulary.Organization.CorporateAnnotation.KeyPrefix}{CompanyHouseVocabulary.Organization.CorporateAnnotation.KeySeparator}{corporateAnnotationIndex}.type"] = corporateAnnotation.type.PrintIfAvailable();
+
+                corporateAnnotationIndex++;
+            }
+        }
+
+        private static void PopulatePreviousCompanyNames(IEntityMetadata metadata, CompanyNew resultCompany)
+        {
+            var previousCompanyNameIndex = 1;
+            foreach (var previousCompanyName in resultCompany.previous_company_names ?? Enumerable.Empty<PreviousCompanyName>())
+            {
+                metadata.Properties[$"{CompanyHouseVocabulary.Organization.PreviousCompanyName.KeyPrefix}{CompanyHouseVocabulary.Organization.PreviousCompanyName.KeySeparator}{previousCompanyNameIndex}.ceasedOn"] = previousCompanyName.ceased_on.PrintIfAvailable();
+                metadata.Properties[$"{CompanyHouseVocabulary.Organization.PreviousCompanyName.KeyPrefix}{CompanyHouseVocabulary.Organization.PreviousCompanyName.KeySeparator}{previousCompanyNameIndex}.effectiveFrom"] = previousCompanyName.effective_from.PrintIfAvailable();
+                metadata.Properties[$"{CompanyHouseVocabulary.Organization.PreviousCompanyName.KeyPrefix}{CompanyHouseVocabulary.Organization.PreviousCompanyName.KeySeparator}{previousCompanyNameIndex}.name"] = previousCompanyName.name.PrintIfAvailable();
+
+                previousCompanyNameIndex++;
+            }
+        }
 
         // TODO: not used
         private void PopulateContactMetadata(IEntityMetadata metadata, Contact resultItem)
