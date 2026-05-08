@@ -282,7 +282,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             var jobData = new CompanyHouseExternalSearchJobData(configDict);
 
             var client = new RestClient("https://api.companieshouse.gov.uk");
-            var request = new RestRequest { Method = Method.GET };
+            var request = new RestRequest { Method = Method.Get };
 
             request.AddHeader("Authorization", "Basic " + Base64Encode(jobData.ApiKey));
             request.Resource = $"search/companies?q=Google";
@@ -320,7 +320,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 
         public override IPreviewImage GetPrimaryEntityPreviewImage(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request) => throw new NotSupportedException();
 
-        private ConnectionVerificationResult ConstructVerifyConnectionResponse(IRestResponse response)
+        private ConnectionVerificationResult ConstructVerifyConnectionResponse(RestResponse response)
         {
             var errorMessageBase = $"{Constants.ProviderName} returned \"{(int)response.StatusCode} {response.StatusDescription}\".";
             if (response.ErrorException != null)

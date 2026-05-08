@@ -15,7 +15,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         public CompanyHouseClient(CompanyHouseExternalSearchJobData jobData)
         {
             _client = new RestClient("https://api.companieshouse.gov.uk");
-            _request = new RestRequest { Method = Method.GET };
+            _request = new RestRequest { Method = Method.Get };
             _request.AddHeader("Authorization", "Basic " + Base64Encode(jobData.ApiKey));
         }
 
