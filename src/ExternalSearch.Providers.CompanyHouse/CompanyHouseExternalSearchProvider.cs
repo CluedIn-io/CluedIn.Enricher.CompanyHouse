@@ -12,8 +12,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.IO;
-using System.Text.Json;
 using System.Text.RegularExpressions;
 using CluedIn.Core;
 using CluedIn.Core.Connectors;
