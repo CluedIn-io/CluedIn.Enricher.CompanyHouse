@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using CluedIn.ExternalSearch.Providers.CompanyHouse.Model;
 using RestSharp;
+using RestSharp.Serializers.Json;
 
 namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 {
@@ -14,7 +17,12 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 
         public CompanyHouseClient(CompanyHouseExternalSearchJobData jobData)
         {
-            _client = new RestClient("https://api.companieshouse.gov.uk");
+            _client = new RestClient("https://api.companieshouse.gov.uk",
+                configureSerialization: s => s.UseSystemTextJson(new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                    NumberHandling = JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.WriteAsString
+                }));
             _request = new RestRequest { Method = Method.Get };
             _request.AddHeader("Authorization", "Basic " + Base64Encode(jobData.ApiKey));
         }
