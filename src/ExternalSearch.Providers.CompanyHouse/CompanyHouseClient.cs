@@ -81,9 +81,14 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             {
                 var result = _client.ExecuteAsync<T>(request).Result;
 
-                if (result.StatusCode != HttpStatusCode.TooManyRequests || attempt == maxRetries)
+                if (result.StatusCode != HttpStatusCode.TooManyRequests)
                 {
                     return result;
+                }
+
+                if (attempt == maxRetries)
+                {
+                    throw new WebException("TooManyRequests");
                 }
 
                 var waitTime = GetRetryAfterDelay(result);
