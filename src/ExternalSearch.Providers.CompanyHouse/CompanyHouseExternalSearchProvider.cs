@@ -80,6 +80,16 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         {
             var jobData = new CompanyHouseExternalSearchJobData(config);
 
+            return ActionExtensions.ExecuteWithRetry(
+                () => InternalExecuteSearch(context, query, jobData).ToArray(), // important we need to materialize the enumerable for ExecuteWithRetry to work
+                retryCount: 1000, // the core will retry but only 3 times
+                isTransient: ex => ex.IsTransient() || ex.ToString().Contains("TooManyRequests") // added additional transient logic that the core does not know about
+            );
+        }
+
+        private IEnumerable<IExternalSearchQueryResult> InternalExecuteSearch(ExecutionContext context, IExternalSearchQuery query,
+            CompanyHouseExternalSearchJobData jobData)
+        {
             var name = query.QueryParameters.ContainsKey(ExternalSearchQueryParameter.Name)
                 ? query.QueryParameters[ExternalSearchQueryParameter.Name].FirstOrDefault()
                 : null;
@@ -97,6 +107,11 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
                 {
                     foreach (var company in companies.Select(companyResult => client.GetCompany(companyResult.company_number)))
                     {
+                        if (company == null)
+                        {
+                            continue;
+                        }
+
                         yield return new ExternalSearchQueryResult<CompanyNew>(query, company);
                     }
                 }

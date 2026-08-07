@@ -35,7 +35,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse.Model
         public bool? registered_office_is_in_dispute { get; set; }
         public ServiceAddress? service_address { get; set; }
         public List<string>? sic_codes { get; set; }
-        public List<string>? subtype { get; set; }
+        public string? subtype { get; set; }
         public int? super_secure_managing_officer_count { get; set; }
         public string? type { get; set; }
         public bool? undeliverable_registered_office_address { get; set; }
