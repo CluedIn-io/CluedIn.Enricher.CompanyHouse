@@ -153,7 +153,11 @@ confirmed correct.
 
 ## Step 7 — Push and confirm CI
 
-Status: **Pending**
+Status: **Done**
+
+PR #49, build 151977 — fully green on the first push: all three `Multi-version build+test` legs
+(4.7.0, 4.8.0, 5.0.0-beta.*), all three `Integration tests` legs, and `Multi-version: publish` all
+passed.
 
 ---
 
@@ -167,4 +171,4 @@ Status: **Pending**
 - [x] Source — `#if CLUEDIN_V50` guards for the RestSharp 106↔114 break (constructor, `Method`, response types in both `CompanyHouseClient.cs` and `CompanyHouseExternalSearchProvider.cs`); `Parameter.Value`/`HeaderParameter.Value` normalized with `.ToString()` instead of a guard
 - [x] `src/` and the integration test — verified locally for all three legs via real `dotnet build` **and** `dotnet test` (not just build)
 - [x] `GitVersion.yml` — merged `commits-before` into the existing `ignore:` block (duplicate-key trap); `next-version: 1.0`; `commits-before: 2026-03-20T00:00:00` (2-day padding); verified `MajorMinorPatch: 1.0.0` with the pinned GitVersion.Tool 5.9.0
-- [ ] Push branch and confirm the actual Azure DevOps pipeline run is green end-to-end (all three legs + integration tests + `Multi-version: publish`)
+- [x] Pushed branch and confirmed the Azure DevOps pipeline is green end-to-end — PR #49, build 151977: all three legs + `Integration tests` + `Multi-version: publish` passed on the first run
