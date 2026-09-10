@@ -1,7 +1,9 @@
 <Project>
   <PropertyGroup Label="Dependency Versions">
     <_AutoFixture>5.0.0-preview0012</_AutoFixture>
-    <_CluedIn>5.0.0-*</_CluedIn>
+    <!-- Guarded so the pipeline's per-leg -p:_CluedIn=<version> wins; Directory.Build.props sets
+         the same default/guard earlier for DefineConstants/_CluedInPackageSuffix derivation. -->
+    <_CluedIn Condition="'$(_CluedIn)' == ''">5.0.0-*</_CluedIn>
   </PropertyGroup>
   <ItemGroup>
     <!--
@@ -9,14 +11,22 @@
 
         MUST SPECIFY IN CSPROJ AS <PackageReference Name="<depName>" />
     -->
-    <PackageReference Update="Microsoft.NET.Test.Sdk" Version="18.3.0" />
-    <PackageReference Update="AutoFixture.Xunit3" Version="$(_AutoFixture)" />
+    <!-- xunit v3 + AutoFixture.Xunit3 for net10.0 (CluedIn 5.0+) -->
+    <PackageReference Update="Microsoft.NET.Test.Sdk" Version="18.3.0" Condition="$(DefineConstants.Contains('CLUEDIN_V50'))" />
+    <PackageReference Update="AutoFixture.Xunit3" Version="$(_AutoFixture)" Condition="$(DefineConstants.Contains('CLUEDIN_V50'))" />
+    <PackageReference Update="xunit.v3" Version="3.2.2" Condition="$(DefineConstants.Contains('CLUEDIN_V50'))" />
+    <PackageReference Update="xunit.runner.visualstudio" Version="3.1.5" Condition="$(DefineConstants.Contains('CLUEDIN_V50'))" />
+    <!-- xunit v2 + AutoFixture.Xunit2 / Microsoft.NET.Test.Sdk 17.12.0 for net6.0 (CluedIn < 5.0) -->
+    <PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.12.0" Condition="!$(DefineConstants.Contains('CLUEDIN_V50'))" />
+    <PackageReference Update="AutoFixture.Xunit2" Version="4.18.0" Condition="!$(DefineConstants.Contains('CLUEDIN_V50'))" />
+    <PackageReference Update="xunit" Version="2.9.3" Condition="!$(DefineConstants.Contains('CLUEDIN_V50'))" />
+    <PackageReference Update="xunit.runner.visualstudio" Version="2.8.2" Condition="!$(DefineConstants.Contains('CLUEDIN_V50'))" />
     <PackageReference Update="coverlet.msbuild" Version="2.8.0" />
-    <PackageReference Update="xunit.v3" Version="3.2.2" />
-    <PackageReference Update="xunit.runner.visualstudio" Version="3.1.5" />
     <PackageReference Update="Moq" Version="4.20.72" />
     <PackageReference Update="Shouldly" Version="3.0.2" />
-    <PackageReference Update="CluedIn.Testing.Base" Version="5.0.0-*" />
+    <!-- CluedIn.Testing.Base publishes under a version-suffixed package ID per CluedIn leg
+         (.470/.480/.500 - dotless Major.Minor.Patch), not a single ID with a floating version. -->
+    <PackageReference Update="CluedIn.Testing.Base.$(_CluedInPackageSuffix)" Version="1.0.0-*" />
   </ItemGroup>
   <ItemGroup>
     <!--

@@ -8,7 +8,9 @@ using System.Text.Json.Serialization;
 using System.Threading;
 using CluedIn.ExternalSearch.Providers.CompanyHouse.Model;
 using RestSharp;
+#if CLUEDIN_V50
 using RestSharp.Serializers.Json;
+#endif
 
 namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 {
@@ -17,8 +19,13 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         private readonly RestClient _client;
         private readonly RestRequest _request;
 
+        // RestSharp is a different major version per CluedIn generation (106.15.0 on 4.7/4.8's
+        // net6.0 vs 114.0.0 on 5.0's net10.0): the RestClient(string, configureSerialization:)
+        // overload and RestSharp.Serializers.Json.UseSystemTextJson are 107+-only, Method.Get is
+        // PascalCase (was Method.GET), and IRestResponse<T> became RestResponse<T>.
         public CompanyHouseClient(CompanyHouseExternalSearchJobData jobData)
         {
+#if CLUEDIN_V50
             _client = new RestClient("https://api.companieshouse.gov.uk",
                 configureSerialization: s => s.UseSystemTextJson(new JsonSerializerOptions
                 {
@@ -26,6 +33,10 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
                     NumberHandling = JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.WriteAsString
                 }));
             _request = new RestRequest { Method = Method.Get };
+#else
+            _client = new RestClient("https://api.companieshouse.gov.uk");
+            _request = new RestRequest { Method = Method.GET };
+#endif
             _request.AddHeader("Authorization", "Basic " + Base64Encode(jobData.ApiKey));
         }
 
@@ -75,7 +86,13 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             return result.StatusCode != HttpStatusCode.OK ? null : result.Data;
         }
 
-        private RestResponse<T> ExecuteWithRateLimitHandling<T>(RestRequest request, int maxRetries = 3)
+        private
+#if CLUEDIN_V50
+            RestResponse<T>
+#else
+            IRestResponse<T>
+#endif
+            ExecuteWithRateLimitHandling<T>(RestRequest request, int maxRetries = 3)
         {
             for (var attempt = 0; attempt <= maxRetries; attempt++)
             {
@@ -98,11 +115,18 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             return null;
         }
 
-        private static TimeSpan GetRetryAfterDelay<T>(RestResponse<T> response)
+        private static TimeSpan GetRetryAfterDelay<T>(
+#if CLUEDIN_V50
+            RestResponse<T> response)
+#else
+            IRestResponse<T> response)
+#endif
         {
             // ReSharper disable once StringLiteralTypo
             var resetHeader = response.Headers?.FirstOrDefault(h => string.Equals(h.Name, "X-Ratelimit-Reset", StringComparison.OrdinalIgnoreCase));
-            if (resetHeader?.Value is { } resetValue && long.TryParse(resetValue, out var resetEpoch))
+            // Parameter.Value is `object` on RestSharp 106.x (pre-4.7/4.8) but `string` on 114.x
+            // (5.0+) - ToString() normalizes both without needing a #if here.
+            if (resetHeader?.Value?.ToString() is { } resetValue && long.TryParse(resetValue, out var resetEpoch))
             {
                 var resetTime = DateTimeOffset.FromUnixTimeSeconds(resetEpoch);
                 var delay = resetTime - DateTimeOffset.UtcNow;
@@ -116,7 +140,7 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             // Fallback: use X-Ratelimit-Window or default to 60 seconds
             // ReSharper disable once StringLiteralTypo
             var windowHeader = response.Headers?.FirstOrDefault(h => string.Equals(h.Name, "X-Ratelimit-Window", StringComparison.OrdinalIgnoreCase));
-            if (windowHeader?.Value is not { } windowValue)
+            if (windowHeader?.Value?.ToString() is not { } windowValue)
             {
                 return TimeSpan.FromSeconds(60);
             }
