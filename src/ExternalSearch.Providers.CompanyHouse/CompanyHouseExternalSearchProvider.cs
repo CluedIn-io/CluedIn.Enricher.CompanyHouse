@@ -80,6 +80,16 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
         {
             var jobData = new CompanyHouseExternalSearchJobData(config);
 
+            return ActionExtensions.ExecuteWithRetry(
+                () => InternalExecuteSearch(context, query, jobData).ToArray(), // important we need to materialize the enumerable for ExecuteWithRetry to work
+                retryCount: 1000, // the core will retry but only 3 times
+                isTransient: ex => ex.IsTransient() || ex.ToString().Contains("TooManyRequests") // added additional transient logic that the core does not know about
+            );
+        }
+
+        private IEnumerable<IExternalSearchQueryResult> InternalExecuteSearch(ExecutionContext context, IExternalSearchQuery query,
+            CompanyHouseExternalSearchJobData jobData)
+        {
             var name = query.QueryParameters.ContainsKey(ExternalSearchQueryParameter.Name)
                 ? query.QueryParameters[ExternalSearchQueryParameter.Name].FirstOrDefault()
                 : null;
@@ -97,6 +107,11 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
                 {
                     foreach (var company in companies.Select(companyResult => client.GetCompany(companyResult.company_number)))
                     {
+                        if (company == null)
+                        {
+                            continue;
+                        }
+
                         yield return new ExternalSearchQueryResult<CompanyNew>(query, company);
                     }
                 }
@@ -282,7 +297,11 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
             var jobData = new CompanyHouseExternalSearchJobData(configDict);
 
             var client = new RestClient("https://api.companieshouse.gov.uk");
+#if CLUEDIN_V50
+            var request = new RestRequest { Method = Method.Get };
+#else
             var request = new RestRequest { Method = Method.GET };
+#endif
 
             request.AddHeader("Authorization", "Basic " + Base64Encode(jobData.ApiKey));
             request.Resource = $"search/companies?q=Google";
@@ -320,7 +339,12 @@ namespace CluedIn.ExternalSearch.Providers.CompanyHouse
 
         public override IPreviewImage GetPrimaryEntityPreviewImage(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request) => throw new NotSupportedException();
 
-        private ConnectionVerificationResult ConstructVerifyConnectionResponse(IRestResponse response)
+        private ConnectionVerificationResult ConstructVerifyConnectionResponse(
+#if CLUEDIN_V50
+            RestResponse response)
+#else
+            IRestResponse response)
+#endif
         {
             var errorMessageBase = $"{Constants.ProviderName} returned \"{(int)response.StatusCode} {response.StatusDescription}\".";
             if (response.ErrorException != null)

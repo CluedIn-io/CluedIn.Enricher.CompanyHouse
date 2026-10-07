@@ -5,13 +5,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\companyhouse.svg" />
   </ItemGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <LangVersion>preview</LangVersion>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <LangVersion>preview</LangVersion>
-    </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CluedIn.Core" />
     <PackageReference Include="CluedIn.ExternalSearch" />
