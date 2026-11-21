@@ -49,6 +49,7 @@ namespace CluedIn.Provider.ExternalSearch.CompanyHouse
             { "vocabKeyPrefix", CompanyHouseVocabulary.Organization.KeyPrefix },
             { "autoSubmission", false },
             { "dataSourceSetId", string.Empty },
+            { "fieldGroups", Constants.FieldGroups }, // for UI
         };
 
         public IExternalSearchProvider ExternalSearchProvider { get; }
